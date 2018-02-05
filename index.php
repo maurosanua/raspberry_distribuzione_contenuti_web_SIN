@@ -1,7 +1,13 @@
- <iframe id="iframe1" src="https://app.innovafarmacia.it/sites/mastersumo/monitor/pfizer/thermacare" style="width:512px;height:256px;"></iframe> 
- 
- <button id="bottone">Prova</button>
- 
+<html>
+	<head>
+		<title>Rasp-url</title>
+	</head>
+	<body style="margin: 0px;">
+<iframe id="iframe1" src="https://app.innovafarmacia.it/sites/mastersumo/monitor/pfizer/thermacare" style="width:512px;height:256px;overflow:hidden;overflow-y: scroll;"></iframe> 
+
+
+
+
  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
  <script>
  
@@ -17,4 +23,54 @@
 
  });
  
+ 
+ 
+ 
+var url_code = 0;
+ 
+function aggiorna_url(){
+	$.ajax({
+		url: "script/get_url.php",
+		method: "POST",
+		
+		dataType: "json",
+		success: function (json_risposta) {
+			if (json_risposta.status === "OK"){
+				if(json_risposta.code != url_code){
+					url_code = json_risposta.code;
+					change_url(json_risposta.url);
+				}
+			}else{
+			}
+		},
+		error: function(XMLHttpRequest, textStatus, errorThrown) { 
+			//messaggio o gestione dell’errore
+			console.log("Status: " + textStatus); 
+			console.log("Error: " + errorThrown); 
+		 }
+	});
+
+}
+ 
+
+function aggiorna_loop(){
+	aggiorna_url()
+	setTimeout(function(){ aggiorna_loop(); }, 3000);
+}
+ 
+aggiorna_loop();
+
+
+
+function change_url(url){
+	$('#iframe1').fadeOut(500,function(){
+		$('#iframe1').attr('src',url ).load(function(){
+			$(this).fadeIn(1000);    
+		});
+	});
+}
+ 
  </script>
+ 
+	</body>
+</html>
