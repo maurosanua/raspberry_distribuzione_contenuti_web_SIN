@@ -5,9 +5,7 @@ init_sessione();
 
 $conn = new DB_PDO();
 
-$url = "https://app.innovafarmacia.it//sites/mastersumo/monitor/chicco/trailer";
-$code = 3;
-$durata = 5;
+
 
 $cambio_scena = true;
 
@@ -45,11 +43,199 @@ if($cambio_scena){
 	//dobbiamo prima valutare se è subentrato un evento.
 	//in assenza di eventi mettiamo la scena di default.
 	
-	$sql = "SELECT * FROM log_eventi where processato = 0";
+	$sql = "SELECT * FROM log_eventi where processato = 0 order by data_evento DESC";
 	$arr = $conn->query_risultati($sql);
+	
 
 	if (count($arr)>0){
+		//echo "qui";
 		
+		
+		
+		$razza = $arr[0]["razza"];
+		$eta = $arr[0]["eta"];
+		$genere = $arr[0]["genere"];
+		
+		if($genere == ""){
+			$genere = null;
+		}
+		
+		if($eta == ""){
+			$eta = null;
+		}
+		
+		if($razza == ""){
+			$razza = null;
+		}
+		
+		if(strlen($razza)>0 || strlen($eta) >0 || strlen($genere) >0){
+			//c'è almeno una persona
+			
+			//vediamo se li matcha tutti
+			if($cambio_scena){
+				
+				$sql = "SELECT * FROM scene where "
+						. "(genere = ?) and"
+						. "(eta = ?) and"
+						. "(razza = ?) and"
+						. " live = 0"
+						. " order by data_start ASC";
+				$dati_query = array($genere, $eta, $razza);
+				$arr = $conn->query_risultati($sql, $dati_query);
+
+				if (count($arr)>0){
+					$cambio_scena = false;
+
+					$sql = "UPDATE scene set live = 0";
+					$conn->esegui_query($sql);
+
+					$scena_obj = new classe_scene($arr[0]["id"]);
+					$scena_obj->set_live(1);
+					$scena_obj->set_data_start(date("Y-m-d H:i:s"));
+					$esito = $scena_obj->salva(FALSE);
+
+					//var_dump($esito);
+
+					$url = $scena_obj->get_url();
+					$code = $scena_obj->get_id();
+					$durata = $scena_obj->get_durata();
+				}
+			}
+			
+			
+			
+			//almeno due
+			if($cambio_scena){
+				
+				$sql = "SELECT * FROM scene where (genere is not null or eta is not null or razza is not null) and "
+						. "(genere = ?) and"
+						. "(eta = ?) and"
+						. " live = 0"
+						. " order by data_start ASC";
+				$dati_query = array($genere, $eta);
+				$arr = $conn->query_risultati($sql, $dati_query);
+
+				if (count($arr)>0){
+					$cambio_scena = false;
+
+					$sql = "UPDATE scene set live = 0";
+					$conn->esegui_query($sql);
+
+					$scena_obj = new classe_scene($arr[0]["id"]);
+					$scena_obj->set_live(1);
+					$scena_obj->set_data_start(date("Y-m-d H:i:s"));
+					$esito = $scena_obj->salva(FALSE);
+
+					//var_dump($esito);
+
+					$url = $scena_obj->get_url();
+					$code = $scena_obj->get_id();
+					$durata = $scena_obj->get_durata();
+				}
+			}
+			
+			
+			
+			if($cambio_scena){
+				
+				$sql = "SELECT * FROM scene where (genere is not null or eta is not null or razza is not null) and "
+						. "(genere = ?) and"
+						. "(razza = ?) and"
+						. " live = 0"
+						. " order by data_start ASC";
+				$dati_query = array($genere,  $razza);
+				$arr = $conn->query_risultati($sql, $dati_query);
+
+				if (count($arr)>0){
+					$cambio_scena = false;
+
+					$sql = "UPDATE scene set live = 0";
+					$conn->esegui_query($sql);
+
+					$scena_obj = new classe_scene($arr[0]["id"]);
+					$scena_obj->set_live(1);
+					$scena_obj->set_data_start(date("Y-m-d H:i:s"));
+					$esito = $scena_obj->salva(FALSE);
+
+					//var_dump($esito);
+
+					$url = $scena_obj->get_url();
+					$code = $scena_obj->get_id();
+					$durata = $scena_obj->get_durata();
+				}
+			}
+			
+			
+			
+			
+			if($cambio_scena){
+				
+				$sql = "SELECT * FROM scene where (genere is not null or eta is not null or razza is not null) and "
+						. "(eta = ?) and"
+						. "(razza = ?) and"
+						. " live = 0"
+						. " order by data_start ASC";
+				$dati_query = array( $eta, $razza);
+				$arr = $conn->query_risultati($sql, $dati_query);
+
+				
+				
+				if (count($arr)>0){
+					$cambio_scena = false;
+
+					$sql = "UPDATE scene set live = 0";
+					$conn->esegui_query($sql);
+
+					$scena_obj = new classe_scene($arr[0]["id"]);
+					$scena_obj->set_live(1);
+					$scena_obj->set_data_start(date("Y-m-d H:i:s"));
+					$esito = $scena_obj->salva(FALSE);
+
+					//var_dump($esito);
+
+					$url = $scena_obj->get_url();
+					$code = $scena_obj->get_id();
+					$durata = $scena_obj->get_durata();
+				}
+			}
+			
+			
+			
+		
+			if($cambio_scena){
+				//vediamo se almeno ce ne è uno
+				$sql = "SELECT * FROM scene where (genere is not null or eta is not null or razza is not null) and "
+						. "(genere = ?  or eta = ? or razza = ?) and"
+						. " live = 0"
+						. " order by data_start ASC";
+				$dati_query = array($genere, $eta, $razza);
+				$arr = $conn->query_risultati($sql, $dati_query);
+			
+				
+				if (count($arr)>0){
+					$cambio_scena = false;
+
+					$sql = "UPDATE scene set live = 0";
+					$conn->esegui_query($sql);
+
+					$scena_obj = new classe_scene($arr[0]["id"]);
+					$scena_obj->set_live(1);
+					$scena_obj->set_data_start(date("Y-m-d H:i:s"));
+					$esito = $scena_obj->salva(FALSE);
+
+					//var_dump($esito);
+
+					$url = $scena_obj->get_url();
+					$code = $scena_obj->get_id();
+					$durata = $scena_obj->get_durata();
+				}
+			}
+
+			//dovremmo gestire se sono più di uno, perché potrebbe voler dire che sono entrate tante persone insieme
+		}
+		
+		
+
 	}
 	
 	if (count($arr)==0 || $cambio_scena){
@@ -81,4 +267,6 @@ $arr_return = array("url"=>$url,"durata"=>$durata, "code"=>$code, "status"=>"OK"
 
 echo json_encode($arr_return);
 
+
+$conn->Close();
 ?>
