@@ -340,6 +340,8 @@ class base_log_eventi {
 	private $eta = null;
 	private $razza = null;
 	private $processato = null;
+	private $camera_id = null;
+	private $appearance_datetime = null;
 
 	private $errore = false;
 	protected $attr = array();
@@ -374,6 +376,8 @@ class base_log_eventi {
 		$this->attr[] = $this->eta = new attributo("eta");
 		$this->attr[] = $this->razza = new attributo("razza");
 		$this->attr[] = $this->processato = new attributo("processato", "bool_int");
+		$this->attr[] = $this->camera_id = new attributo("camera_id", "int");
+		$this->attr[] = $this->appearance_datetime = new attributo("appearance_datetime", "data_time");
 
 		if($id > 0){
 
@@ -392,6 +396,8 @@ class base_log_eventi {
 				$this->eta->set_valore($arr[0]["eta"]);
 				$this->razza->set_valore($arr[0]["razza"]);
 				$this->processato->set_valore($arr[0]["processato"]);
+				$this->camera_id->set_valore($arr[0]["camera_id"]);
+				$this->appearance_datetime->set_valore($arr[0]["appearance_datetime"]);
 		
 				$this->old_data["id"] = $this->id;
 				foreach($this->attr as $attr){
@@ -572,15 +578,16 @@ class base_log_eventi {
 
 			//andiamo a inserire le informazioni nel db
 			if($this->id == 0){
-
-				$sql = "INSERT INTO log_eventi (data_evento, genere, eta, razza, processato) VALUES (?, ?, ?, ?, ?)";
+				$sql = "INSERT INTO log_eventi (data_evento, genere, eta, razza, processato, camera_id, appearance_datetime) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
 				$dati_query = array(
 								$this->data_evento->get_valore(99), 
 								$this->genere->get_valore(99), 
 								$this->eta->get_valore(99), 
 								$this->razza->get_valore(99), 
-								$this->processato->get_valore(99)
+								$this->processato->get_valore(99), 
+								$this->camera_id->get_valore(99), 
+								$this->appearance_datetime->get_valore(99)
 							);
 
 				
@@ -611,7 +618,7 @@ class base_log_eventi {
 
 			}else{//aggiorniamo l'oggetto
 
-				$sql = "UPDATE log_eventi SET data_evento = ?, genere = ?, eta = ?, razza = ?, processato = ?"
+				$sql = "UPDATE log_eventi SET data_evento = ?, genere = ?, eta = ?, razza = ?, processato = ?, camera_id = ?, appearance_datetime = ?"
 						." WHERE id = ?";
 
 				$dati_query = array(
@@ -620,6 +627,8 @@ class base_log_eventi {
 								$this->eta->get_valore(99), 
 								$this->razza->get_valore(99), 
 								$this->processato->get_valore(99), 
+								$this->camera_id->get_valore(99), 
+								$this->appearance_datetime->get_valore(99), 
 								$this->id
 							);
 
@@ -716,6 +725,26 @@ class base_log_eventi {
 		return $this->processato->is_corretto();
 	}
 	
+	/**
+	 * 
+	 * @param string $camera_id
+	 * @return boolean true se il valore e' corretto, false altrimenti
+	 */
+	public function set_camera_id($camera_id) {
+		$this->camera_id->set_valore($camera_id);
+		return $this->camera_id->is_corretto();
+	}
+	
+	/**
+	 * 
+	 * @param string $appearance_datetime
+	 * @return boolean true se il valore e' corretto, false altrimenti
+	 */
+	public function set_appearance_datetime($appearance_datetime) {
+		$this->appearance_datetime->set_valore($appearance_datetime);
+		return $this->appearance_datetime->is_corretto();
+	}
+	
 
 	/******************************
 	 * getter
@@ -747,6 +776,14 @@ class base_log_eventi {
 	
 	public function get_processato($formattazione_dato = 1) {
 		return $this->processato->get_valore($formattazione_dato);
+	}
+	
+	public function get_camera_id($formattazione_dato = 1) {
+		return $this->camera_id->get_valore($formattazione_dato);
+	}
+	
+	public function get_appearance_datetime($formattazione_dato = 1) {
+		return $this->appearance_datetime->get_valore($formattazione_dato);
 	}
 
 

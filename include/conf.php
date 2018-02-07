@@ -4,10 +4,10 @@
 -------------------------------------------------------------------------------------------------------------------------------- */
 //define("DB_TYPE",		"MSSQL");
 define("DB_TYPE",		"MySQL");
-define("DB_HOST",		"172.16.30.4");
+define("DB_HOST",		"localhost");
 define("DB_NAME",		"ggate_raspberry_sviluppo");
 define("DB_USER",		"ggate_rasp");
-define("DB_PASSWORD",	"skhe3olxzmclerurww");
+define("DB_PASSWORD",		"skhe3olxzmclerurww");
 
 
 /*	PARAMETRI DI DEBUG
