@@ -3,7 +3,7 @@
 		<title>Rasp-url</title>
 	</head>
 	<body style="margin: 0px;overflow: hidden;">
-<iframe id="iframe1" src="https://app.innovafarmacia.it/sites/mastersumo/monitor/pfizer/thermacare" style="width:100%;overflow:hidden;overflow-y: scroll;"></iframe> 
+<iframe id="iframe1" src="https://app.innovafarmacia.it/sites/mastersumo/monitor/pfizer/thermacare" style="width:529px;height:256px;overflow:hidden;overflow-y: scroll;" frameBorder="0"></iframe> 
 
 
 
@@ -25,7 +25,7 @@
  
 $(document).ready(function() {
 	var altezza = $( window ).height()+"px";
-	$("#iframe1").css("height",altezza);
+	//$("#iframe1").css("height",altezza);
 
 });
  

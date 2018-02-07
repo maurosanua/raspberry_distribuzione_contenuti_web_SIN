@@ -135,7 +135,7 @@ if($cambio_scena){
 			}
 			
 			
-			
+			/*
 			if($cambio_scena){
 				
 				$sql = "SELECT * FROM scene where (genere is not null or eta is not null or razza is not null) and "
@@ -164,10 +164,11 @@ if($cambio_scena){
 					$durata = $scena_obj->get_durata();
 				}
 			}
+			*/
 			
 			
 			
-			
+			/*
 			if($cambio_scena){
 				
 				$sql = "SELECT * FROM scene where (genere is not null or eta is not null or razza is not null) and "
@@ -198,10 +199,11 @@ if($cambio_scena){
 					$durata = $scena_obj->get_durata();
 				}
 			}
+			*/
 			
 			
 			
-		
+			/*
 			if($cambio_scena){
 				//vediamo se almeno ce ne è uno
 				$sql = "SELECT * FROM scene where (genere is not null or eta is not null or razza is not null) and "
@@ -230,6 +232,7 @@ if($cambio_scena){
 					$durata = $scena_obj->get_durata();
 				}
 			}
+			*/
 
 			//dovremmo gestire se sono più di uno, perché potrebbe voler dire che sono entrate tante persone insieme
 		}
