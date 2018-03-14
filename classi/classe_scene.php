@@ -329,7 +329,7 @@ class classe_scene extends base_scene {
 			
 			case 2:
 				//slideshow
-				$url = $this->get_link();
+				$url = URL_RASPBERRY."/slideshow.php?scena_id=".$this->get_id();
 				break;
 			
 			case 3:
@@ -339,12 +339,12 @@ class classe_scene extends base_scene {
 			
 			case 4:
 				//youtube
-				$url = $this->get_link();
+				$url = URL_RASPBERRY."/youtube.php?scena_id=".$this->get_id();
 				break;
 			
 			case 5:
 				//video
-				$url = $this->get_link();
+				$url = URL_RASPBERRY."/video.php?scena_id=".$this->get_id();
 				break;
 			
 			default :
