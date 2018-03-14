@@ -36,9 +36,16 @@ require_once $prefisso.'classi/classe_mysql.php';
 require_once $prefisso.'classi/classe_user.php';
 require_once $prefisso.'classi/classe_utenti.php';
 
-require_once $prefisso.'classi/classe_last_event.php';
-require_once $prefisso.'classi/classe_log_eventi.php';
+
+require_once $prefisso.'classi/classe_log_eventi_rpi.php';
 require_once $prefisso.'classi/classe_scene.php';
+require_once $prefisso.'classi/classe_dispositivi.php';
+require_once $prefisso.'classi/classe_fascia_oraria.php';
+require_once $prefisso.'classi/classe_palinsesto.php';
+require_once $prefisso.'classi/classe_rel_scene_fascia_oraria.php';
+
+
+
 
 
 ?>

@@ -1,6 +1,6 @@
 <?php
 			
-class classe_scene extends base_scene {
+class classe_palinsesto extends base_palinsesto {
 
 	/* -----------------------------------
 	 * filtri per la ricerca
@@ -197,9 +197,9 @@ class classe_scene extends base_scene {
 
 
 	/**
-	 * restituisce un array di oggetti classe_scene con i risultati della query
+	 * restituisce un array di oggetti classe_palinsesto con i risultati della query
 	 * 
-	 * @return \classe_scene array con gli oggetti di tipo classe_scene
+	 * @return \classe_palinsesto array con gli oggetti di tipo classe_palinsesto
 	 */
 	public function elenco_ricerca(){
 
@@ -256,7 +256,7 @@ class classe_scene extends base_scene {
 
 
 		//andiamo a comporre la query
-		$sql = "SELECT id AS id_ricerca FROM scene";
+		$sql = "SELECT id AS id_ricerca FROM palinsesto";
 
 		if(strlen($criterio_1) > 0 || strlen($criterio_2) > 0 || strlen($criterio_ricerca) > 0){
 			$sql .= " WHERE".$criterio_1.$criterio_2.$criterio_ricerca;
@@ -298,7 +298,7 @@ class classe_scene extends base_scene {
 		foreach ($arr as $value) {
 
 			try{
-				$risultati[] = new classe_scene($value["id_ricerca"]);
+				$risultati[] = new classe_palinsesto($value["id_ricerca"]);
 			}catch (Exception $e){}
 
 			$cont++;
@@ -318,48 +318,13 @@ class classe_scene extends base_scene {
 	 * metodi ad hoc
 	 */
 	 
-	public function genera_url() {
-		$url = "blanck.php";
-				
-		switch ($this->get_tipo_scena_id()){
-			case 1:
-				//link
-				$url = $this->get_link();
-				break;
-			
-			case 2:
-				//slideshow
-				$url = $this->get_link();
-				break;
-			
-			case 3:
-				//summernote
-				$url = URL_RASPBERRY."/pagina_html.php?scena_id=".$this->get_id();
-				break;
-			
-			case 4:
-				//youtube
-				$url = $this->get_link();
-				break;
-			
-			case 5:
-				//video
-				$url = $this->get_link();
-				break;
-			
-			default :
-				$url = "blanck.php";
-		}
-		
-		return $url;
-	}
 
 }
 
 
 
 
-class base_scene {
+class base_palinsesto {
 
 	protected $is_connesso = 0;
 	protected $destroy_conn = 0;
@@ -371,15 +336,9 @@ class base_scene {
 	protected $exist = false;
 
 	private $nome = null;
-	private $tipo_scena_id = null;
-	private $link = null;
-	private $token = null;
-	private $contenuti = null;
-	private $campo_html = null;
-	private $anteprima = null;
-	private $versione = null;
 	private $created_at = null;
 	private $updated_at = null;
+	private $versione = null;
 
 	private $errore = false;
 	protected $attr = array();
@@ -410,19 +369,13 @@ class base_scene {
 
 
 		$this->attr[] = $this->nome = new attributo("nome");
-		$this->attr[] = $this->tipo_scena_id = new attributo("tipo_scena_id", "int");
-		$this->attr[] = $this->link = new attributo("link");
-		$this->attr[] = $this->token = new attributo("token");
-		$this->attr[] = $this->contenuti = new attributo("contenuti");
-		$this->attr[] = $this->campo_html = new attributo("campo_html");
-		$this->attr[] = $this->anteprima = new attributo("anteprima");
-		$this->attr[] = $this->versione = new attributo("versione", "int");
 		$this->attr[] = $this->created_at = new attributo("created_at");
 		$this->attr[] = $this->updated_at = new attributo("updated_at");
+		$this->attr[] = $this->versione = new attributo("versione", "int");
 
 		if($id > 0){
 
-			$sql = "SELECT * FROM scene WHERE id = ?";
+			$sql = "SELECT * FROM palinsesto WHERE id = ?";
 			$dati_query = array($this->id);
 
 			$arr = $this->connessione()->query_risultati($sql, $dati_query);
@@ -433,15 +386,9 @@ class base_scene {
 				$this->exist = true;
 
 				$this->nome->set_valore($arr[0]["nome"]);
-				$this->tipo_scena_id->set_valore($arr[0]["tipo_scena_id"]);
-				$this->link->set_valore($arr[0]["link"]);
-				$this->token->set_valore($arr[0]["token"]);
-				$this->contenuti->set_valore($arr[0]["contenuti"]);
-				$this->campo_html->set_valore($arr[0]["campo_html"]);
-				$this->anteprima->set_valore($arr[0]["anteprima"]);
-				$this->versione->set_valore($arr[0]["versione"]);
 				$this->created_at->set_valore($arr[0]["created_at"]);
 				$this->updated_at->set_valore($arr[0]["updated_at"]);
+				$this->versione->set_valore($arr[0]["versione"]);
 		
 				$this->old_data["id"] = $this->id;
 				foreach($this->attr as $attr){
@@ -490,7 +437,7 @@ class base_scene {
 			$log = new classe_log();
 
 			if($log->enabled()){
-				$log->set_nome_azione("delete scene");
+				$log->set_nome_azione("delete palinsesto");
 				$log->set_tipo_azione("delete");
 				$log->set_info("id: ".$this->id); //informazioni aggiuntive
 				
@@ -623,19 +570,13 @@ class base_scene {
 			//andiamo a inserire le informazioni nel db
 			if($this->id == 0){
 
-				$sql = "INSERT INTO scene (nome, tipo_scena_id, link, token, contenuti, campo_html, anteprima, versione, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+				$sql = "INSERT INTO palinsesto (nome, created_at, updated_at, versione) VALUES (?, ?, ?, ?)";
 
 				$dati_query = array(
 								$this->nome->get_valore(99), 
-								$this->tipo_scena_id->get_valore(99), 
-								$this->link->get_valore(99), 
-								$this->token->get_valore(99), 
-								$this->contenuti->get_valore(99), 
-								$this->campo_html->get_valore(99), 
-								$this->anteprima->get_valore(99), 
-								$this->versione->get_valore(99), 
 								$this->created_at->get_valore(99), 
-								$this->updated_at->get_valore(99)
+								$this->updated_at->get_valore(99), 
+								$this->versione->get_valore(99)
 							);
 
 				
@@ -652,7 +593,7 @@ class base_scene {
 					$log = new classe_log();
 
 					if($log->enabled()){
-						$log->set_nome_azione("insert scene");
+						$log->set_nome_azione("insert palinsesto");
 						$log->set_tipo_azione("insert");
 						$log->set_info("id: ".$this->id); //informazioni aggiuntive
 						
@@ -666,20 +607,14 @@ class base_scene {
 
 			}else{//aggiorniamo l'oggetto
 
-				$sql = "UPDATE scene SET nome = ?, tipo_scena_id = ?, link = ?, token = ?, contenuti = ?, campo_html = ?, anteprima = ?, versione = ?, created_at = ?, updated_at = ?"
+				$sql = "UPDATE palinsesto SET nome = ?, created_at = ?, updated_at = ?, versione = ?"
 						." WHERE id = ?";
 
 				$dati_query = array(
 								$this->nome->get_valore(99), 
-								$this->tipo_scena_id->get_valore(99), 
-								$this->link->get_valore(99), 
-								$this->token->get_valore(99), 
-								$this->contenuti->get_valore(99), 
-								$this->campo_html->get_valore(99), 
-								$this->anteprima->get_valore(99), 
-								$this->versione->get_valore(99), 
 								$this->created_at->get_valore(99), 
 								$this->updated_at->get_valore(99), 
+								$this->versione->get_valore(99), 
 								$this->id
 							);
 
@@ -696,7 +631,7 @@ class base_scene {
 					$log = new classe_log();
 
 					if($log->enabled()){
-						$log->set_nome_azione("update scene");
+						$log->set_nome_azione("update palinsesto");
 						$log->set_tipo_azione("update");
 						$log->set_info("id: ".$this->id); //informazioni aggiuntive
 						
@@ -738,76 +673,6 @@ class base_scene {
 	
 	/**
 	 * 
-	 * @param string $tipo_scena_id
-	 * @return boolean true se il valore e' corretto, false altrimenti
-	 */
-	public function set_tipo_scena_id($tipo_scena_id) {
-		$this->tipo_scena_id->set_valore($tipo_scena_id);
-		return $this->tipo_scena_id->is_corretto();
-	}
-	
-	/**
-	 * 
-	 * @param string $link
-	 * @return boolean true se il valore e' corretto, false altrimenti
-	 */
-	public function set_link($link) {
-		$this->link->set_valore($link);
-		return $this->link->is_corretto();
-	}
-	
-	/**
-	 * 
-	 * @param string $token
-	 * @return boolean true se il valore e' corretto, false altrimenti
-	 */
-	public function set_token($token) {
-		$this->token->set_valore($token);
-		return $this->token->is_corretto();
-	}
-	
-	/**
-	 * 
-	 * @param string $contenuti
-	 * @return boolean true se il valore e' corretto, false altrimenti
-	 */
-	public function set_contenuti($contenuti) {
-		$this->contenuti->set_valore($contenuti);
-		return $this->contenuti->is_corretto();
-	}
-	
-	/**
-	 * 
-	 * @param string $campo_html
-	 * @return boolean true se il valore e' corretto, false altrimenti
-	 */
-	public function set_campo_html($campo_html) {
-		$this->campo_html->set_valore($campo_html);
-		return $this->campo_html->is_corretto();
-	}
-	
-	/**
-	 * 
-	 * @param string $anteprima
-	 * @return boolean true se il valore e' corretto, false altrimenti
-	 */
-	public function set_anteprima($anteprima) {
-		$this->anteprima->set_valore($anteprima);
-		return $this->anteprima->is_corretto();
-	}
-	
-	/**
-	 * 
-	 * @param string $versione
-	 * @return boolean true se il valore e' corretto, false altrimenti
-	 */
-	public function set_versione($versione) {
-		$this->versione->set_valore($versione);
-		return $this->versione->is_corretto();
-	}
-	
-	/**
-	 * 
 	 * @param string $created_at
 	 * @return boolean true se il valore e' corretto, false altrimenti
 	 */
@@ -824,6 +689,16 @@ class base_scene {
 	public function set_updated_at($updated_at) {
 		$this->updated_at->set_valore($updated_at);
 		return $this->updated_at->is_corretto();
+	}
+	
+	/**
+	 * 
+	 * @param string $versione
+	 * @return boolean true se il valore e' corretto, false altrimenti
+	 */
+	public function set_versione($versione) {
+		$this->versione->set_valore($versione);
+		return $this->versione->is_corretto();
 	}
 	
 
@@ -843,40 +718,16 @@ class base_scene {
 		return $this->nome->get_valore($formattazione_dato);
 	}
 	
-	public function get_tipo_scena_id($formattazione_dato = 1) {
-		return $this->tipo_scena_id->get_valore($formattazione_dato);
-	}
-	
-	public function get_link($formattazione_dato = 1) {
-		return $this->link->get_valore($formattazione_dato);
-	}
-	
-	public function get_token($formattazione_dato = 1) {
-		return $this->token->get_valore($formattazione_dato);
-	}
-	
-	public function get_contenuti($formattazione_dato = 1) {
-		return $this->contenuti->get_valore($formattazione_dato);
-	}
-	
-	public function get_campo_html($formattazione_dato = 1) {
-		return $this->campo_html->get_valore($formattazione_dato);
-	}
-	
-	public function get_anteprima($formattazione_dato = 1) {
-		return $this->anteprima->get_valore($formattazione_dato);
-	}
-	
-	public function get_versione($formattazione_dato = 1) {
-		return $this->versione->get_valore($formattazione_dato);
-	}
-	
 	public function get_created_at($formattazione_dato = 1) {
 		return $this->created_at->get_valore($formattazione_dato);
 	}
 	
 	public function get_updated_at($formattazione_dato = 1) {
 		return $this->updated_at->get_valore($formattazione_dato);
+	}
+	
+	public function get_versione($formattazione_dato = 1) {
+		return $this->versione->get_valore($formattazione_dato);
 	}
 
 

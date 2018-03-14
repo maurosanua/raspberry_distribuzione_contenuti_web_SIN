@@ -1,6 +1,6 @@
 <?php
 			
-class classe_scene extends base_scene {
+class classe_dispositivi extends base_dispositivi {
 
 	/* -----------------------------------
 	 * filtri per la ricerca
@@ -197,9 +197,9 @@ class classe_scene extends base_scene {
 
 
 	/**
-	 * restituisce un array di oggetti classe_scene con i risultati della query
+	 * restituisce un array di oggetti classe_dispositivi con i risultati della query
 	 * 
-	 * @return \classe_scene array con gli oggetti di tipo classe_scene
+	 * @return \classe_dispositivi array con gli oggetti di tipo classe_dispositivi
 	 */
 	public function elenco_ricerca(){
 
@@ -256,7 +256,7 @@ class classe_scene extends base_scene {
 
 
 		//andiamo a comporre la query
-		$sql = "SELECT id AS id_ricerca FROM scene";
+		$sql = "SELECT id AS id_ricerca FROM dispositivi";
 
 		if(strlen($criterio_1) > 0 || strlen($criterio_2) > 0 || strlen($criterio_ricerca) > 0){
 			$sql .= " WHERE".$criterio_1.$criterio_2.$criterio_ricerca;
@@ -298,7 +298,7 @@ class classe_scene extends base_scene {
 		foreach ($arr as $value) {
 
 			try{
-				$risultati[] = new classe_scene($value["id_ricerca"]);
+				$risultati[] = new classe_dispositivi($value["id_ricerca"]);
 			}catch (Exception $e){}
 
 			$cont++;
@@ -318,48 +318,13 @@ class classe_scene extends base_scene {
 	 * metodi ad hoc
 	 */
 	 
-	public function genera_url() {
-		$url = "blanck.php";
-				
-		switch ($this->get_tipo_scena_id()){
-			case 1:
-				//link
-				$url = $this->get_link();
-				break;
-			
-			case 2:
-				//slideshow
-				$url = $this->get_link();
-				break;
-			
-			case 3:
-				//summernote
-				$url = URL_RASPBERRY."/pagina_html.php?scena_id=".$this->get_id();
-				break;
-			
-			case 4:
-				//youtube
-				$url = $this->get_link();
-				break;
-			
-			case 5:
-				//video
-				$url = $this->get_link();
-				break;
-			
-			default :
-				$url = "blanck.php";
-		}
-		
-		return $url;
-	}
 
 }
 
 
 
 
-class base_scene {
+class base_dispositivi {
 
 	protected $is_connesso = 0;
 	protected $destroy_conn = 0;
@@ -371,15 +336,20 @@ class base_scene {
 	protected $exist = false;
 
 	private $nome = null;
-	private $tipo_scena_id = null;
-	private $link = null;
-	private $token = null;
-	private $contenuti = null;
-	private $campo_html = null;
-	private $anteprima = null;
-	private $versione = null;
+	private $palinsesto_id = null;
+	private $user_id = null;
+	private $numero_serie = null;
+	private $cipher_key = null;
+	private $network_config = null;
+	private $versione_contenuti = null;
+	private $shutdown = null;
+	private $restart = null;
 	private $created_at = null;
 	private $updated_at = null;
+	private $schermo_h = null;
+	private $schermo_w = null;
+	private $iframe_h = null;
+	private $iframe_w = null;
 
 	private $errore = false;
 	protected $attr = array();
@@ -410,19 +380,24 @@ class base_scene {
 
 
 		$this->attr[] = $this->nome = new attributo("nome");
-		$this->attr[] = $this->tipo_scena_id = new attributo("tipo_scena_id", "int");
-		$this->attr[] = $this->link = new attributo("link");
-		$this->attr[] = $this->token = new attributo("token");
-		$this->attr[] = $this->contenuti = new attributo("contenuti");
-		$this->attr[] = $this->campo_html = new attributo("campo_html");
-		$this->attr[] = $this->anteprima = new attributo("anteprima");
-		$this->attr[] = $this->versione = new attributo("versione", "int");
+		$this->attr[] = $this->palinsesto_id = new attributo("palinsesto_id", "int");
+		$this->attr[] = $this->user_id = new attributo("user_id", "int");
+		$this->attr[] = $this->numero_serie = new attributo("numero_serie");
+		$this->attr[] = $this->cipher_key = new attributo("cipher_key");
+		$this->attr[] = $this->network_config = new attributo("network_config");
+		$this->attr[] = $this->versione_contenuti = new attributo("versione_contenuti", "int");
+		$this->attr[] = $this->shutdown = new attributo("shutdown", "bool_int");
+		$this->attr[] = $this->restart = new attributo("restart", "bool_int");
 		$this->attr[] = $this->created_at = new attributo("created_at");
 		$this->attr[] = $this->updated_at = new attributo("updated_at");
+		$this->attr[] = $this->schermo_h = new attributo("schermo_h", "int");
+		$this->attr[] = $this->schermo_w = new attributo("schermo_w", "int");
+		$this->attr[] = $this->iframe_h = new attributo("iframe_h", "int");
+		$this->attr[] = $this->iframe_w = new attributo("iframe_w", "int");
 
 		if($id > 0){
 
-			$sql = "SELECT * FROM scene WHERE id = ?";
+			$sql = "SELECT * FROM dispositivi WHERE id = ?";
 			$dati_query = array($this->id);
 
 			$arr = $this->connessione()->query_risultati($sql, $dati_query);
@@ -433,15 +408,20 @@ class base_scene {
 				$this->exist = true;
 
 				$this->nome->set_valore($arr[0]["nome"]);
-				$this->tipo_scena_id->set_valore($arr[0]["tipo_scena_id"]);
-				$this->link->set_valore($arr[0]["link"]);
-				$this->token->set_valore($arr[0]["token"]);
-				$this->contenuti->set_valore($arr[0]["contenuti"]);
-				$this->campo_html->set_valore($arr[0]["campo_html"]);
-				$this->anteprima->set_valore($arr[0]["anteprima"]);
-				$this->versione->set_valore($arr[0]["versione"]);
+				$this->palinsesto_id->set_valore($arr[0]["palinsesto_id"]);
+				$this->user_id->set_valore($arr[0]["user_id"]);
+				$this->numero_serie->set_valore($arr[0]["numero_serie"]);
+				$this->cipher_key->set_valore($arr[0]["cipher_key"]);
+				$this->network_config->set_valore($arr[0]["network_config"]);
+				$this->versione_contenuti->set_valore($arr[0]["versione_contenuti"]);
+				$this->shutdown->set_valore($arr[0]["shutdown"]);
+				$this->restart->set_valore($arr[0]["restart"]);
 				$this->created_at->set_valore($arr[0]["created_at"]);
 				$this->updated_at->set_valore($arr[0]["updated_at"]);
+				$this->schermo_h->set_valore($arr[0]["schermo_h"]);
+				$this->schermo_w->set_valore($arr[0]["schermo_w"]);
+				$this->iframe_h->set_valore($arr[0]["iframe_h"]);
+				$this->iframe_w->set_valore($arr[0]["iframe_w"]);
 		
 				$this->old_data["id"] = $this->id;
 				foreach($this->attr as $attr){
@@ -490,7 +470,7 @@ class base_scene {
 			$log = new classe_log();
 
 			if($log->enabled()){
-				$log->set_nome_azione("delete scene");
+				$log->set_nome_azione("delete dispositivi");
 				$log->set_tipo_azione("delete");
 				$log->set_info("id: ".$this->id); //informazioni aggiuntive
 				
@@ -623,19 +603,24 @@ class base_scene {
 			//andiamo a inserire le informazioni nel db
 			if($this->id == 0){
 
-				$sql = "INSERT INTO scene (nome, tipo_scena_id, link, token, contenuti, campo_html, anteprima, versione, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+				$sql = "INSERT INTO dispositivi (nome, palinsesto_id, user_id, numero_serie, cipher_key, network_config, versione_contenuti, shutdown, restart, created_at, updated_at, schermo_h, schermo_w, iframe_h, iframe_w) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 				$dati_query = array(
 								$this->nome->get_valore(99), 
-								$this->tipo_scena_id->get_valore(99), 
-								$this->link->get_valore(99), 
-								$this->token->get_valore(99), 
-								$this->contenuti->get_valore(99), 
-								$this->campo_html->get_valore(99), 
-								$this->anteprima->get_valore(99), 
-								$this->versione->get_valore(99), 
+								$this->palinsesto_id->get_valore(99), 
+								$this->user_id->get_valore(99), 
+								$this->numero_serie->get_valore(99), 
+								$this->cipher_key->get_valore(99), 
+								$this->network_config->get_valore(99), 
+								$this->versione_contenuti->get_valore(99), 
+								$this->shutdown->get_valore(99), 
+								$this->restart->get_valore(99), 
 								$this->created_at->get_valore(99), 
-								$this->updated_at->get_valore(99)
+								$this->updated_at->get_valore(99), 
+								$this->schermo_h->get_valore(99), 
+								$this->schermo_w->get_valore(99), 
+								$this->iframe_h->get_valore(99), 
+								$this->iframe_w->get_valore(99)
 							);
 
 				
@@ -652,7 +637,7 @@ class base_scene {
 					$log = new classe_log();
 
 					if($log->enabled()){
-						$log->set_nome_azione("insert scene");
+						$log->set_nome_azione("insert dispositivi");
 						$log->set_tipo_azione("insert");
 						$log->set_info("id: ".$this->id); //informazioni aggiuntive
 						
@@ -666,20 +651,25 @@ class base_scene {
 
 			}else{//aggiorniamo l'oggetto
 
-				$sql = "UPDATE scene SET nome = ?, tipo_scena_id = ?, link = ?, token = ?, contenuti = ?, campo_html = ?, anteprima = ?, versione = ?, created_at = ?, updated_at = ?"
+				$sql = "UPDATE dispositivi SET nome = ?, palinsesto_id = ?, user_id = ?, numero_serie = ?, cipher_key = ?, network_config = ?, versione_contenuti = ?, shutdown = ?, restart = ?, created_at = ?, updated_at = ?, schermo_h = ?, schermo_w = ?, iframe_h = ?, iframe_w = ?"
 						." WHERE id = ?";
 
 				$dati_query = array(
 								$this->nome->get_valore(99), 
-								$this->tipo_scena_id->get_valore(99), 
-								$this->link->get_valore(99), 
-								$this->token->get_valore(99), 
-								$this->contenuti->get_valore(99), 
-								$this->campo_html->get_valore(99), 
-								$this->anteprima->get_valore(99), 
-								$this->versione->get_valore(99), 
+								$this->palinsesto_id->get_valore(99), 
+								$this->user_id->get_valore(99), 
+								$this->numero_serie->get_valore(99), 
+								$this->cipher_key->get_valore(99), 
+								$this->network_config->get_valore(99), 
+								$this->versione_contenuti->get_valore(99), 
+								$this->shutdown->get_valore(99), 
+								$this->restart->get_valore(99), 
 								$this->created_at->get_valore(99), 
 								$this->updated_at->get_valore(99), 
+								$this->schermo_h->get_valore(99), 
+								$this->schermo_w->get_valore(99), 
+								$this->iframe_h->get_valore(99), 
+								$this->iframe_w->get_valore(99), 
 								$this->id
 							);
 
@@ -696,7 +686,7 @@ class base_scene {
 					$log = new classe_log();
 
 					if($log->enabled()){
-						$log->set_nome_azione("update scene");
+						$log->set_nome_azione("update dispositivi");
 						$log->set_tipo_azione("update");
 						$log->set_info("id: ".$this->id); //informazioni aggiuntive
 						
@@ -738,72 +728,82 @@ class base_scene {
 	
 	/**
 	 * 
-	 * @param string $tipo_scena_id
+	 * @param string $palinsesto_id
 	 * @return boolean true se il valore e' corretto, false altrimenti
 	 */
-	public function set_tipo_scena_id($tipo_scena_id) {
-		$this->tipo_scena_id->set_valore($tipo_scena_id);
-		return $this->tipo_scena_id->is_corretto();
+	public function set_palinsesto_id($palinsesto_id) {
+		$this->palinsesto_id->set_valore($palinsesto_id);
+		return $this->palinsesto_id->is_corretto();
 	}
 	
 	/**
 	 * 
-	 * @param string $link
+	 * @param string $user_id
 	 * @return boolean true se il valore e' corretto, false altrimenti
 	 */
-	public function set_link($link) {
-		$this->link->set_valore($link);
-		return $this->link->is_corretto();
+	public function set_user_id($user_id) {
+		$this->user_id->set_valore($user_id);
+		return $this->user_id->is_corretto();
 	}
 	
 	/**
 	 * 
-	 * @param string $token
+	 * @param string $numero_serie
 	 * @return boolean true se il valore e' corretto, false altrimenti
 	 */
-	public function set_token($token) {
-		$this->token->set_valore($token);
-		return $this->token->is_corretto();
+	public function set_numero_serie($numero_serie) {
+		$this->numero_serie->set_valore($numero_serie);
+		return $this->numero_serie->is_corretto();
 	}
 	
 	/**
 	 * 
-	 * @param string $contenuti
+	 * @param string $cipher_key
 	 * @return boolean true se il valore e' corretto, false altrimenti
 	 */
-	public function set_contenuti($contenuti) {
-		$this->contenuti->set_valore($contenuti);
-		return $this->contenuti->is_corretto();
+	public function set_cipher_key($cipher_key) {
+		$this->cipher_key->set_valore($cipher_key);
+		return $this->cipher_key->is_corretto();
 	}
 	
 	/**
 	 * 
-	 * @param string $campo_html
+	 * @param string $network_config
 	 * @return boolean true se il valore e' corretto, false altrimenti
 	 */
-	public function set_campo_html($campo_html) {
-		$this->campo_html->set_valore($campo_html);
-		return $this->campo_html->is_corretto();
+	public function set_network_config($network_config) {
+		$this->network_config->set_valore($network_config);
+		return $this->network_config->is_corretto();
 	}
 	
 	/**
 	 * 
-	 * @param string $anteprima
+	 * @param string $versione_contenuti
 	 * @return boolean true se il valore e' corretto, false altrimenti
 	 */
-	public function set_anteprima($anteprima) {
-		$this->anteprima->set_valore($anteprima);
-		return $this->anteprima->is_corretto();
+	public function set_versione_contenuti($versione_contenuti) {
+		$this->versione_contenuti->set_valore($versione_contenuti);
+		return $this->versione_contenuti->is_corretto();
 	}
 	
 	/**
 	 * 
-	 * @param string $versione
+	 * @param string $shutdown
 	 * @return boolean true se il valore e' corretto, false altrimenti
 	 */
-	public function set_versione($versione) {
-		$this->versione->set_valore($versione);
-		return $this->versione->is_corretto();
+	public function set_shutdown($shutdown) {
+		$this->shutdown->set_valore($shutdown);
+		return $this->shutdown->is_corretto();
+	}
+	
+	/**
+	 * 
+	 * @param string $restart
+	 * @return boolean true se il valore e' corretto, false altrimenti
+	 */
+	public function set_restart($restart) {
+		$this->restart->set_valore($restart);
+		return $this->restart->is_corretto();
 	}
 	
 	/**
@@ -826,6 +826,46 @@ class base_scene {
 		return $this->updated_at->is_corretto();
 	}
 	
+	/**
+	 * 
+	 * @param string $schermo_h
+	 * @return boolean true se il valore e' corretto, false altrimenti
+	 */
+	public function set_schermo_h($schermo_h) {
+		$this->schermo_h->set_valore($schermo_h);
+		return $this->schermo_h->is_corretto();
+	}
+	
+	/**
+	 * 
+	 * @param string $schermo_w
+	 * @return boolean true se il valore e' corretto, false altrimenti
+	 */
+	public function set_schermo_w($schermo_w) {
+		$this->schermo_w->set_valore($schermo_w);
+		return $this->schermo_w->is_corretto();
+	}
+	
+	/**
+	 * 
+	 * @param string $iframe_h
+	 * @return boolean true se il valore e' corretto, false altrimenti
+	 */
+	public function set_iframe_h($iframe_h) {
+		$this->iframe_h->set_valore($iframe_h);
+		return $this->iframe_h->is_corretto();
+	}
+	
+	/**
+	 * 
+	 * @param string $iframe_w
+	 * @return boolean true se il valore e' corretto, false altrimenti
+	 */
+	public function set_iframe_w($iframe_w) {
+		$this->iframe_w->set_valore($iframe_w);
+		return $this->iframe_w->is_corretto();
+	}
+	
 
 	/******************************
 	 * getter
@@ -843,32 +883,36 @@ class base_scene {
 		return $this->nome->get_valore($formattazione_dato);
 	}
 	
-	public function get_tipo_scena_id($formattazione_dato = 1) {
-		return $this->tipo_scena_id->get_valore($formattazione_dato);
+	public function get_palinsesto_id($formattazione_dato = 1) {
+		return $this->palinsesto_id->get_valore($formattazione_dato);
 	}
 	
-	public function get_link($formattazione_dato = 1) {
-		return $this->link->get_valore($formattazione_dato);
+	public function get_user_id($formattazione_dato = 1) {
+		return $this->user_id->get_valore($formattazione_dato);
 	}
 	
-	public function get_token($formattazione_dato = 1) {
-		return $this->token->get_valore($formattazione_dato);
+	public function get_numero_serie($formattazione_dato = 1) {
+		return $this->numero_serie->get_valore($formattazione_dato);
 	}
 	
-	public function get_contenuti($formattazione_dato = 1) {
-		return $this->contenuti->get_valore($formattazione_dato);
+	public function get_cipher_key($formattazione_dato = 1) {
+		return $this->cipher_key->get_valore($formattazione_dato);
 	}
 	
-	public function get_campo_html($formattazione_dato = 1) {
-		return $this->campo_html->get_valore($formattazione_dato);
+	public function get_network_config($formattazione_dato = 1) {
+		return $this->network_config->get_valore($formattazione_dato);
 	}
 	
-	public function get_anteprima($formattazione_dato = 1) {
-		return $this->anteprima->get_valore($formattazione_dato);
+	public function get_versione_contenuti($formattazione_dato = 1) {
+		return $this->versione_contenuti->get_valore($formattazione_dato);
 	}
 	
-	public function get_versione($formattazione_dato = 1) {
-		return $this->versione->get_valore($formattazione_dato);
+	public function get_shutdown($formattazione_dato = 1) {
+		return $this->shutdown->get_valore($formattazione_dato);
+	}
+	
+	public function get_restart($formattazione_dato = 1) {
+		return $this->restart->get_valore($formattazione_dato);
 	}
 	
 	public function get_created_at($formattazione_dato = 1) {
@@ -877,6 +921,22 @@ class base_scene {
 	
 	public function get_updated_at($formattazione_dato = 1) {
 		return $this->updated_at->get_valore($formattazione_dato);
+	}
+	
+	public function get_schermo_h($formattazione_dato = 1) {
+		return $this->schermo_h->get_valore($formattazione_dato);
+	}
+	
+	public function get_schermo_w($formattazione_dato = 1) {
+		return $this->schermo_w->get_valore($formattazione_dato);
+	}
+	
+	public function get_iframe_h($formattazione_dato = 1) {
+		return $this->iframe_h->get_valore($formattazione_dato);
+	}
+	
+	public function get_iframe_w($formattazione_dato = 1) {
+		return $this->iframe_w->get_valore($formattazione_dato);
 	}
 
 

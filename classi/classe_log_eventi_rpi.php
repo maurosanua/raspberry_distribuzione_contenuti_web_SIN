@@ -1,6 +1,6 @@
 <?php
 			
-class classe_last_event extends base_last_event {
+class classe_log_eventi_rpi extends base_log_eventi_rpi {
 
 	/* -----------------------------------
 	 * filtri per la ricerca
@@ -197,9 +197,9 @@ class classe_last_event extends base_last_event {
 
 
 	/**
-	 * restituisce un array di oggetti classe_last_event con i risultati della query
+	 * restituisce un array di oggetti classe_log_eventi_rpi con i risultati della query
 	 * 
-	 * @return \classe_last_event array con gli oggetti di tipo classe_last_event
+	 * @return \classe_log_eventi_rpi array con gli oggetti di tipo classe_log_eventi_rpi
 	 */
 	public function elenco_ricerca(){
 
@@ -256,7 +256,7 @@ class classe_last_event extends base_last_event {
 
 
 		//andiamo a comporre la query
-		$sql = "SELECT id AS id_ricerca FROM last_event";
+		$sql = "SELECT id AS id_ricerca FROM log_eventi_rpi";
 
 		if(strlen($criterio_1) > 0 || strlen($criterio_2) > 0 || strlen($criterio_ricerca) > 0){
 			$sql .= " WHERE".$criterio_1.$criterio_2.$criterio_ricerca;
@@ -298,7 +298,7 @@ class classe_last_event extends base_last_event {
 		foreach ($arr as $value) {
 
 			try{
-				$risultati[] = new classe_last_event($value["id_ricerca"]);
+				$risultati[] = new classe_log_eventi_rpi($value["id_ricerca"]);
 			}catch (Exception $e){}
 
 			$cont++;
@@ -324,7 +324,7 @@ class classe_last_event extends base_last_event {
 
 
 
-class base_last_event {
+class base_log_eventi_rpi {
 
 	protected $is_connesso = 0;
 	protected $destroy_conn = 0;
@@ -338,9 +338,12 @@ class base_last_event {
 	private $data_evento = null;
 	private $genere = null;
 	private $eta = null;
-	private $razza = null;
-	private $trasmesso = null;
-	private $data_trasmissione = null;
+	private $etnia = null;
+	private $processato = null;
+	private $camera_id = null;
+	private $appearance_datetime = null;
+	private $created_at = null;
+	private $updated_at = null;
 
 	private $errore = false;
 	protected $attr = array();
@@ -373,13 +376,16 @@ class base_last_event {
 		$this->attr[] = $this->data_evento = new attributo("data_evento", "data_time");
 		$this->attr[] = $this->genere = new attributo("genere");
 		$this->attr[] = $this->eta = new attributo("eta");
-		$this->attr[] = $this->razza = new attributo("razza");
-		$this->attr[] = $this->trasmesso = new attributo("trasmesso", "bool_int");
-		$this->attr[] = $this->data_trasmissione = new attributo("data_trasmissione", "data_time");
+		$this->attr[] = $this->etnia = new attributo("etnia");
+		$this->attr[] = $this->processato = new attributo("processato", "bool_int");
+		$this->attr[] = $this->camera_id = new attributo("camera_id", "int");
+		$this->attr[] = $this->appearance_datetime = new attributo("appearance_datetime", "data_time");
+		$this->attr[] = $this->created_at = new attributo("created_at");
+		$this->attr[] = $this->updated_at = new attributo("updated_at");
 
 		if($id > 0){
 
-			$sql = "SELECT * FROM last_event WHERE id = ?";
+			$sql = "SELECT * FROM log_eventi_rpi WHERE id = ?";
 			$dati_query = array($this->id);
 
 			$arr = $this->connessione()->query_risultati($sql, $dati_query);
@@ -392,9 +398,12 @@ class base_last_event {
 				$this->data_evento->set_valore($arr[0]["data_evento"]);
 				$this->genere->set_valore($arr[0]["genere"]);
 				$this->eta->set_valore($arr[0]["eta"]);
-				$this->razza->set_valore($arr[0]["razza"]);
-				$this->trasmesso->set_valore($arr[0]["trasmesso"]);
-				$this->data_trasmissione->set_valore($arr[0]["data_trasmissione"]);
+				$this->etnia->set_valore($arr[0]["etnia"]);
+				$this->processato->set_valore($arr[0]["processato"]);
+				$this->camera_id->set_valore($arr[0]["camera_id"]);
+				$this->appearance_datetime->set_valore($arr[0]["appearance_datetime"]);
+				$this->created_at->set_valore($arr[0]["created_at"]);
+				$this->updated_at->set_valore($arr[0]["updated_at"]);
 		
 				$this->old_data["id"] = $this->id;
 				foreach($this->attr as $attr){
@@ -443,7 +452,7 @@ class base_last_event {
 			$log = new classe_log();
 
 			if($log->enabled()){
-				$log->set_nome_azione("delete last_event");
+				$log->set_nome_azione("delete log_eventi_rpi");
 				$log->set_tipo_azione("delete");
 				$log->set_info("id: ".$this->id); //informazioni aggiuntive
 				
@@ -576,15 +585,18 @@ class base_last_event {
 			//andiamo a inserire le informazioni nel db
 			if($this->id == 0){
 
-				$sql = "INSERT INTO last_event (data_evento, genere, eta, razza, trasmesso, data_trasmissione) VALUES (?, ?, ?, ?, ?, ?)";
+				$sql = "INSERT INTO log_eventi_rpi (data_evento, genere, eta, etnia, processato, camera_id, appearance_datetime, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 				$dati_query = array(
 								$this->data_evento->get_valore(99), 
 								$this->genere->get_valore(99), 
 								$this->eta->get_valore(99), 
-								$this->razza->get_valore(99), 
-								$this->trasmesso->get_valore(99), 
-								$this->data_trasmissione->get_valore(99)
+								$this->etnia->get_valore(99), 
+								$this->processato->get_valore(99), 
+								$this->camera_id->get_valore(99), 
+								$this->appearance_datetime->get_valore(99), 
+								$this->created_at->get_valore(99), 
+								$this->updated_at->get_valore(99)
 							);
 
 				
@@ -601,7 +613,7 @@ class base_last_event {
 					$log = new classe_log();
 
 					if($log->enabled()){
-						$log->set_nome_azione("insert last_event");
+						$log->set_nome_azione("insert log_eventi_rpi");
 						$log->set_tipo_azione("insert");
 						$log->set_info("id: ".$this->id); //informazioni aggiuntive
 						
@@ -615,16 +627,19 @@ class base_last_event {
 
 			}else{//aggiorniamo l'oggetto
 
-				$sql = "UPDATE last_event SET data_evento = ?, genere = ?, eta = ?, razza = ?, trasmesso = ?, data_trasmissione = ?"
+				$sql = "UPDATE log_eventi_rpi SET data_evento = ?, genere = ?, eta = ?, etnia = ?, processato = ?, camera_id = ?, appearance_datetime = ?, created_at = ?, updated_at = ?"
 						." WHERE id = ?";
 
 				$dati_query = array(
 								$this->data_evento->get_valore(99), 
 								$this->genere->get_valore(99), 
 								$this->eta->get_valore(99), 
-								$this->razza->get_valore(99), 
-								$this->trasmesso->get_valore(99), 
-								$this->data_trasmissione->get_valore(99), 
+								$this->etnia->get_valore(99), 
+								$this->processato->get_valore(99), 
+								$this->camera_id->get_valore(99), 
+								$this->appearance_datetime->get_valore(99), 
+								$this->created_at->get_valore(99), 
+								$this->updated_at->get_valore(99), 
 								$this->id
 							);
 
@@ -641,7 +656,7 @@ class base_last_event {
 					$log = new classe_log();
 
 					if($log->enabled()){
-						$log->set_nome_azione("update last_event");
+						$log->set_nome_azione("update log_eventi_rpi");
 						$log->set_tipo_azione("update");
 						$log->set_info("id: ".$this->id); //informazioni aggiuntive
 						
@@ -703,32 +718,62 @@ class base_last_event {
 	
 	/**
 	 * 
-	 * @param string $razza
+	 * @param string $etnia
 	 * @return boolean true se il valore e' corretto, false altrimenti
 	 */
-	public function set_razza($razza) {
-		$this->razza->set_valore($razza);
-		return $this->razza->is_corretto();
+	public function set_etnia($etnia) {
+		$this->etnia->set_valore($etnia);
+		return $this->etnia->is_corretto();
 	}
 	
 	/**
 	 * 
-	 * @param string $trasmesso
+	 * @param string $processato
 	 * @return boolean true se il valore e' corretto, false altrimenti
 	 */
-	public function set_trasmesso($trasmesso) {
-		$this->trasmesso->set_valore($trasmesso);
-		return $this->trasmesso->is_corretto();
+	public function set_processato($processato) {
+		$this->processato->set_valore($processato);
+		return $this->processato->is_corretto();
 	}
 	
 	/**
 	 * 
-	 * @param string $data_trasmissione
+	 * @param string $camera_id
 	 * @return boolean true se il valore e' corretto, false altrimenti
 	 */
-	public function set_data_trasmissione($data_trasmissione) {
-		$this->data_trasmissione->set_valore($data_trasmissione);
-		return $this->data_trasmissione->is_corretto();
+	public function set_camera_id($camera_id) {
+		$this->camera_id->set_valore($camera_id);
+		return $this->camera_id->is_corretto();
+	}
+	
+	/**
+	 * 
+	 * @param string $appearance_datetime
+	 * @return boolean true se il valore e' corretto, false altrimenti
+	 */
+	public function set_appearance_datetime($appearance_datetime) {
+		$this->appearance_datetime->set_valore($appearance_datetime);
+		return $this->appearance_datetime->is_corretto();
+	}
+	
+	/**
+	 * 
+	 * @param string $created_at
+	 * @return boolean true se il valore e' corretto, false altrimenti
+	 */
+	public function set_created_at($created_at) {
+		$this->created_at->set_valore($created_at);
+		return $this->created_at->is_corretto();
+	}
+	
+	/**
+	 * 
+	 * @param string $updated_at
+	 * @return boolean true se il valore e' corretto, false altrimenti
+	 */
+	public function set_updated_at($updated_at) {
+		$this->updated_at->set_valore($updated_at);
+		return $this->updated_at->is_corretto();
 	}
 	
 
@@ -756,16 +801,28 @@ class base_last_event {
 		return $this->eta->get_valore($formattazione_dato);
 	}
 	
-	public function get_razza($formattazione_dato = 1) {
-		return $this->razza->get_valore($formattazione_dato);
+	public function get_etnia($formattazione_dato = 1) {
+		return $this->etnia->get_valore($formattazione_dato);
 	}
 	
-	public function get_trasmesso($formattazione_dato = 1) {
-		return $this->trasmesso->get_valore($formattazione_dato);
+	public function get_processato($formattazione_dato = 1) {
+		return $this->processato->get_valore($formattazione_dato);
 	}
 	
-	public function get_data_trasmissione($formattazione_dato = 1) {
-		return $this->data_trasmissione->get_valore($formattazione_dato);
+	public function get_camera_id($formattazione_dato = 1) {
+		return $this->camera_id->get_valore($formattazione_dato);
+	}
+	
+	public function get_appearance_datetime($formattazione_dato = 1) {
+		return $this->appearance_datetime->get_valore($formattazione_dato);
+	}
+	
+	public function get_created_at($formattazione_dato = 1) {
+		return $this->created_at->get_valore($formattazione_dato);
+	}
+	
+	public function get_updated_at($formattazione_dato = 1) {
+		return $this->updated_at->get_valore($formattazione_dato);
 	}
 
 

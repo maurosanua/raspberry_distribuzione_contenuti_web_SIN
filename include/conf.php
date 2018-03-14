@@ -4,11 +4,13 @@
 -------------------------------------------------------------------------------------------------------------------------------- */
 //define("DB_TYPE",		"MSSQL");
 define("DB_TYPE",		"MySQL");
-define("DB_HOST",		"localhost");
-define("DB_NAME",		"ggate_raspberry_sviluppo");
-define("DB_USER",		"ggate_rasp");
-define("DB_PASSWORD",		"skhe3olxzmclerurww");
+define("DB_HOST",		"172.16.30.63");
+define("DB_NAME",		"palinsesto");
+define("DB_USER",		"root");
+define("DB_PASSWORD",		"jsmSinoxDB.1");
 
+define("URL_RASPBERRY","http://l116z.sinergo.it/raspberry");
+define("URL_SERVER","http://shire.sinergo.it/palinsesto/");
 
 /*	PARAMETRI DI DEBUG
 -------------------------------------------------------------------------------------------------------------------------------- */

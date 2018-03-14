@@ -1,6 +1,6 @@
 <?php
 			
-class classe_log_eventi extends base_log_eventi {
+class classe_fascia_oraria extends base_fascia_oraria {
 
 	/* -----------------------------------
 	 * filtri per la ricerca
@@ -197,9 +197,9 @@ class classe_log_eventi extends base_log_eventi {
 
 
 	/**
-	 * restituisce un array di oggetti classe_log_eventi con i risultati della query
+	 * restituisce un array di oggetti classe_fascia_oraria con i risultati della query
 	 * 
-	 * @return \classe_log_eventi array con gli oggetti di tipo classe_log_eventi
+	 * @return \classe_fascia_oraria array con gli oggetti di tipo classe_fascia_oraria
 	 */
 	public function elenco_ricerca(){
 
@@ -256,7 +256,7 @@ class classe_log_eventi extends base_log_eventi {
 
 
 		//andiamo a comporre la query
-		$sql = "SELECT id AS id_ricerca FROM log_eventi";
+		$sql = "SELECT id AS id_ricerca FROM fascia_oraria";
 
 		if(strlen($criterio_1) > 0 || strlen($criterio_2) > 0 || strlen($criterio_ricerca) > 0){
 			$sql .= " WHERE".$criterio_1.$criterio_2.$criterio_ricerca;
@@ -269,7 +269,7 @@ class classe_log_eventi extends base_log_eventi {
 		$sql_count = $sql; //query per contare gli elementi senza il limit -> paginazione
 		$sql .= $ordinamento.$limit;
 
-		//echo "".  $this->connessione()->debug_query($sql, $dati_query);
+		//echo "<p>".  $this->connessione()->debug_query($sql, $dati_query);
 		$arr = $this->connessione()->query_risultati($sql, $dati_query);
 
 		
@@ -298,7 +298,7 @@ class classe_log_eventi extends base_log_eventi {
 		foreach ($arr as $value) {
 
 			try{
-				$risultati[] = new classe_log_eventi($value["id_ricerca"]);
+				$risultati[] = new classe_fascia_oraria($value["id_ricerca"]);
 			}catch (Exception $e){}
 
 			$cont++;
@@ -324,7 +324,7 @@ class classe_log_eventi extends base_log_eventi {
 
 
 
-class base_log_eventi {
+class base_fascia_oraria {
 
 	protected $is_connesso = 0;
 	protected $destroy_conn = 0;
@@ -335,13 +335,11 @@ class base_log_eventi {
 	
 	protected $exist = false;
 
-	private $data_evento = null;
-	private $genere = null;
-	private $eta = null;
-	private $razza = null;
-	private $processato = null;
-	private $camera_id = null;
-	private $appearance_datetime = null;
+	private $palinsesto_id = null;
+	private $ora_inizio = null;
+	private $ora_fine = null;
+	private $created_at = null;
+	private $updated_at = null;
 
 	private $errore = false;
 	protected $attr = array();
@@ -371,17 +369,15 @@ class base_log_eventi {
 		$this->id = $id;
 
 
-		$this->attr[] = $this->data_evento = new attributo("data_evento", "data_time");
-		$this->attr[] = $this->genere = new attributo("genere");
-		$this->attr[] = $this->eta = new attributo("eta");
-		$this->attr[] = $this->razza = new attributo("razza");
-		$this->attr[] = $this->processato = new attributo("processato", "bool_int");
-		$this->attr[] = $this->camera_id = new attributo("camera_id", "int");
-		$this->attr[] = $this->appearance_datetime = new attributo("appearance_datetime", "data_time");
+		$this->attr[] = $this->palinsesto_id = new attributo("palinsesto_id", "int");
+		$this->attr[] = $this->ora_inizio = new attributo("ora_inizio");
+		$this->attr[] = $this->ora_fine = new attributo("ora_fine");
+		$this->attr[] = $this->created_at = new attributo("created_at");
+		$this->attr[] = $this->updated_at = new attributo("updated_at");
 
 		if($id > 0){
 
-			$sql = "SELECT * FROM log_eventi WHERE id = ?";
+			$sql = "SELECT * FROM fascia_oraria WHERE id = ?";
 			$dati_query = array($this->id);
 
 			$arr = $this->connessione()->query_risultati($sql, $dati_query);
@@ -391,13 +387,11 @@ class base_log_eventi {
 
 				$this->exist = true;
 
-				$this->data_evento->set_valore($arr[0]["data_evento"]);
-				$this->genere->set_valore($arr[0]["genere"]);
-				$this->eta->set_valore($arr[0]["eta"]);
-				$this->razza->set_valore($arr[0]["razza"]);
-				$this->processato->set_valore($arr[0]["processato"]);
-				$this->camera_id->set_valore($arr[0]["camera_id"]);
-				$this->appearance_datetime->set_valore($arr[0]["appearance_datetime"]);
+				$this->palinsesto_id->set_valore($arr[0]["palinsesto_id"]);
+				$this->ora_inizio->set_valore($arr[0]["ora_inizio"]);
+				$this->ora_fine->set_valore($arr[0]["ora_fine"]);
+				$this->created_at->set_valore($arr[0]["created_at"]);
+				$this->updated_at->set_valore($arr[0]["updated_at"]);
 		
 				$this->old_data["id"] = $this->id;
 				foreach($this->attr as $attr){
@@ -446,7 +440,7 @@ class base_log_eventi {
 			$log = new classe_log();
 
 			if($log->enabled()){
-				$log->set_nome_azione("delete log_eventi");
+				$log->set_nome_azione("delete fascia_oraria");
 				$log->set_tipo_azione("delete");
 				$log->set_info("id: ".$this->id); //informazioni aggiuntive
 				
@@ -578,16 +572,15 @@ class base_log_eventi {
 
 			//andiamo a inserire le informazioni nel db
 			if($this->id == 0){
-				$sql = "INSERT INTO log_eventi (data_evento, genere, eta, razza, processato, camera_id, appearance_datetime) VALUES (?, ?, ?, ?, ?, ?, ?)";
+
+				$sql = "INSERT INTO fascia_oraria (palinsesto_id, ora_inizio, ora_fine, created_at, updated_at) VALUES (?, ?, ?, ?, ?)";
 
 				$dati_query = array(
-								$this->data_evento->get_valore(99), 
-								$this->genere->get_valore(99), 
-								$this->eta->get_valore(99), 
-								$this->razza->get_valore(99), 
-								$this->processato->get_valore(99), 
-								$this->camera_id->get_valore(99), 
-								$this->appearance_datetime->get_valore(99)
+								$this->palinsesto_id->get_valore(99), 
+								$this->ora_inizio->get_valore(99), 
+								$this->ora_fine->get_valore(99), 
+								$this->created_at->get_valore(99), 
+								$this->updated_at->get_valore(99)
 							);
 
 				
@@ -604,7 +597,7 @@ class base_log_eventi {
 					$log = new classe_log();
 
 					if($log->enabled()){
-						$log->set_nome_azione("insert log_eventi");
+						$log->set_nome_azione("insert fascia_oraria");
 						$log->set_tipo_azione("insert");
 						$log->set_info("id: ".$this->id); //informazioni aggiuntive
 						
@@ -618,17 +611,15 @@ class base_log_eventi {
 
 			}else{//aggiorniamo l'oggetto
 
-				$sql = "UPDATE log_eventi SET data_evento = ?, genere = ?, eta = ?, razza = ?, processato = ?, camera_id = ?, appearance_datetime = ?"
+				$sql = "UPDATE fascia_oraria SET palinsesto_id = ?, ora_inizio = ?, ora_fine = ?, created_at = ?, updated_at = ?"
 						." WHERE id = ?";
 
 				$dati_query = array(
-								$this->data_evento->get_valore(99), 
-								$this->genere->get_valore(99), 
-								$this->eta->get_valore(99), 
-								$this->razza->get_valore(99), 
-								$this->processato->get_valore(99), 
-								$this->camera_id->get_valore(99), 
-								$this->appearance_datetime->get_valore(99), 
+								$this->palinsesto_id->get_valore(99), 
+								$this->ora_inizio->get_valore(99), 
+								$this->ora_fine->get_valore(99), 
+								$this->created_at->get_valore(99), 
+								$this->updated_at->get_valore(99), 
 								$this->id
 							);
 
@@ -645,7 +636,7 @@ class base_log_eventi {
 					$log = new classe_log();
 
 					if($log->enabled()){
-						$log->set_nome_azione("update log_eventi");
+						$log->set_nome_azione("update fascia_oraria");
 						$log->set_tipo_azione("update");
 						$log->set_info("id: ".$this->id); //informazioni aggiuntive
 						
@@ -677,72 +668,52 @@ class base_log_eventi {
 	
 	/**
 	 * 
-	 * @param string $data_evento
+	 * @param string $palinsesto_id
 	 * @return boolean true se il valore e' corretto, false altrimenti
 	 */
-	public function set_data_evento($data_evento) {
-		$this->data_evento->set_valore($data_evento);
-		return $this->data_evento->is_corretto();
+	public function set_palinsesto_id($palinsesto_id) {
+		$this->palinsesto_id->set_valore($palinsesto_id);
+		return $this->palinsesto_id->is_corretto();
 	}
 	
 	/**
 	 * 
-	 * @param string $genere
+	 * @param string $ora_inizio
 	 * @return boolean true se il valore e' corretto, false altrimenti
 	 */
-	public function set_genere($genere) {
-		$this->genere->set_valore($genere);
-		return $this->genere->is_corretto();
+	public function set_ora_inizio($ora_inizio) {
+		$this->ora_inizio->set_valore($ora_inizio);
+		return $this->ora_inizio->is_corretto();
 	}
 	
 	/**
 	 * 
-	 * @param string $eta
+	 * @param string $ora_fine
 	 * @return boolean true se il valore e' corretto, false altrimenti
 	 */
-	public function set_eta($eta) {
-		$this->eta->set_valore($eta);
-		return $this->eta->is_corretto();
+	public function set_ora_fine($ora_fine) {
+		$this->ora_fine->set_valore($ora_fine);
+		return $this->ora_fine->is_corretto();
 	}
 	
 	/**
 	 * 
-	 * @param string $razza
+	 * @param string $created_at
 	 * @return boolean true se il valore e' corretto, false altrimenti
 	 */
-	public function set_razza($razza) {
-		$this->razza->set_valore($razza);
-		return $this->razza->is_corretto();
+	public function set_created_at($created_at) {
+		$this->created_at->set_valore($created_at);
+		return $this->created_at->is_corretto();
 	}
 	
 	/**
 	 * 
-	 * @param string $processato
+	 * @param string $updated_at
 	 * @return boolean true se il valore e' corretto, false altrimenti
 	 */
-	public function set_processato($processato) {
-		$this->processato->set_valore($processato);
-		return $this->processato->is_corretto();
-	}
-	
-	/**
-	 * 
-	 * @param string $camera_id
-	 * @return boolean true se il valore e' corretto, false altrimenti
-	 */
-	public function set_camera_id($camera_id) {
-		$this->camera_id->set_valore($camera_id);
-		return $this->camera_id->is_corretto();
-	}
-	
-	/**
-	 * 
-	 * @param string $appearance_datetime
-	 * @return boolean true se il valore e' corretto, false altrimenti
-	 */
-	public function set_appearance_datetime($appearance_datetime) {
-		$this->appearance_datetime->set_valore($appearance_datetime);
-		return $this->appearance_datetime->is_corretto();
+	public function set_updated_at($updated_at) {
+		$this->updated_at->set_valore($updated_at);
+		return $this->updated_at->is_corretto();
 	}
 	
 
@@ -758,32 +729,24 @@ class base_log_eventi {
 		return $this->id;
 	}
 	
-	public function get_data_evento($formattazione_dato = 1) {
-		return $this->data_evento->get_valore($formattazione_dato);
+	public function get_palinsesto_id($formattazione_dato = 1) {
+		return $this->palinsesto_id->get_valore($formattazione_dato);
 	}
 	
-	public function get_genere($formattazione_dato = 1) {
-		return $this->genere->get_valore($formattazione_dato);
+	public function get_ora_inizio($formattazione_dato = 1) {
+		return $this->ora_inizio->get_valore($formattazione_dato);
 	}
 	
-	public function get_eta($formattazione_dato = 1) {
-		return $this->eta->get_valore($formattazione_dato);
+	public function get_ora_fine($formattazione_dato = 1) {
+		return $this->ora_fine->get_valore($formattazione_dato);
 	}
 	
-	public function get_razza($formattazione_dato = 1) {
-		return $this->razza->get_valore($formattazione_dato);
+	public function get_created_at($formattazione_dato = 1) {
+		return $this->created_at->get_valore($formattazione_dato);
 	}
 	
-	public function get_processato($formattazione_dato = 1) {
-		return $this->processato->get_valore($formattazione_dato);
-	}
-	
-	public function get_camera_id($formattazione_dato = 1) {
-		return $this->camera_id->get_valore($formattazione_dato);
-	}
-	
-	public function get_appearance_datetime($formattazione_dato = 1) {
-		return $this->appearance_datetime->get_valore($formattazione_dato);
+	public function get_updated_at($formattazione_dato = 1) {
+		return $this->updated_at->get_valore($formattazione_dato);
 	}
 
 

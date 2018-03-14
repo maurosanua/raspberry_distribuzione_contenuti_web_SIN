@@ -1,9 +1,35 @@
-<html>
+<?
+date_default_timezone_set('Europe/Rome');
+require_once('classi/master_class.php');
+
+$conn = new DB_PDO();
+
+
+$sql = "SELECT * FROM dispositivi where numero_serie = ?";
+$dati_query = array(SERIALE);
+$arr = $conn->query_risultati($sql,$dati_query);
+
+
+$larghezza = 1366;
+$altezza = 768;
+
+if(count($arr)>0){
+	
+	if(strlen($arr[0]["iframe_w"])>0){
+		$larghezza = $arr[0]["iframe_w"];
+	}
+	
+	if(strlen($arr[0]["iframe_h"])>0){
+		$altezza = $arr[0]["iframe_h"];
+	}
+	
+}
+?><html>
 	<head>
 		<title>Rasp-url</title>
 	</head>
 	<body style="margin: 0px;overflow: hidden;">
-<iframe id="iframe1" src="https://app.innovafarmacia.it/sites/mastersumo/monitor/pfizer/thermacare" style="width:529px;height:256px;overflow:hidden;overflow-y: scroll;" frameBorder="0"></iframe> 
+		<iframe id="iframe1" src="blanck.php" style="width:<?=$larghezza?>px;height:<?=$altezza?>px;overflow:hidden;overflow-y: scroll;" frameBorder="0"></iframe> 
 
 
 
@@ -66,6 +92,7 @@ aggiorna_loop();
 
 
 function change_url(url){
+	
 	$('#iframe1').fadeOut(500,function(){
 		$('#iframe1').attr('src',url ).load(function(){
 			$(this).fadeIn(1000);    

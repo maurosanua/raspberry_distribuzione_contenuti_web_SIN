@@ -1,6 +1,6 @@
 <?php
 			
-class classe_scene extends base_scene {
+class classe_rel_scene_fascia_oraria extends base_rel_scene_fascia_oraria {
 
 	/* -----------------------------------
 	 * filtri per la ricerca
@@ -197,9 +197,9 @@ class classe_scene extends base_scene {
 
 
 	/**
-	 * restituisce un array di oggetti classe_scene con i risultati della query
+	 * restituisce un array di oggetti classe_rel_scene_fascia_oraria con i risultati della query
 	 * 
-	 * @return \classe_scene array con gli oggetti di tipo classe_scene
+	 * @return \classe_rel_scene_fascia_oraria array con gli oggetti di tipo classe_rel_scene_fascia_oraria
 	 */
 	public function elenco_ricerca(){
 
@@ -256,7 +256,7 @@ class classe_scene extends base_scene {
 
 
 		//andiamo a comporre la query
-		$sql = "SELECT id AS id_ricerca FROM scene";
+		$sql = "SELECT id AS id_ricerca FROM rel_scene_fascia_oraria";
 
 		if(strlen($criterio_1) > 0 || strlen($criterio_2) > 0 || strlen($criterio_ricerca) > 0){
 			$sql .= " WHERE".$criterio_1.$criterio_2.$criterio_ricerca;
@@ -298,7 +298,7 @@ class classe_scene extends base_scene {
 		foreach ($arr as $value) {
 
 			try{
-				$risultati[] = new classe_scene($value["id_ricerca"]);
+				$risultati[] = new classe_rel_scene_fascia_oraria($value["id_ricerca"]);
 			}catch (Exception $e){}
 
 			$cont++;
@@ -318,48 +318,13 @@ class classe_scene extends base_scene {
 	 * metodi ad hoc
 	 */
 	 
-	public function genera_url() {
-		$url = "blanck.php";
-				
-		switch ($this->get_tipo_scena_id()){
-			case 1:
-				//link
-				$url = $this->get_link();
-				break;
-			
-			case 2:
-				//slideshow
-				$url = $this->get_link();
-				break;
-			
-			case 3:
-				//summernote
-				$url = URL_RASPBERRY."/pagina_html.php?scena_id=".$this->get_id();
-				break;
-			
-			case 4:
-				//youtube
-				$url = $this->get_link();
-				break;
-			
-			case 5:
-				//video
-				$url = $this->get_link();
-				break;
-			
-			default :
-				$url = "blanck.php";
-		}
-		
-		return $url;
-	}
 
 }
 
 
 
 
-class base_scene {
+class base_rel_scene_fascia_oraria {
 
 	protected $is_connesso = 0;
 	protected $destroy_conn = 0;
@@ -370,14 +335,14 @@ class base_scene {
 	
 	protected $exist = false;
 
-	private $nome = null;
-	private $tipo_scena_id = null;
-	private $link = null;
-	private $token = null;
-	private $contenuti = null;
-	private $campo_html = null;
-	private $anteprima = null;
-	private $versione = null;
+	private $scena_id = null;
+	private $fascia_oraria_id = null;
+	private $durata_ms = null;
+	private $sesso = null;
+	private $eta = null;
+	private $etnia = null;
+	private $live = null;
+	private $data_start = null;
 	private $created_at = null;
 	private $updated_at = null;
 
@@ -409,20 +374,20 @@ class base_scene {
 		$this->id = $id;
 
 
-		$this->attr[] = $this->nome = new attributo("nome");
-		$this->attr[] = $this->tipo_scena_id = new attributo("tipo_scena_id", "int");
-		$this->attr[] = $this->link = new attributo("link");
-		$this->attr[] = $this->token = new attributo("token");
-		$this->attr[] = $this->contenuti = new attributo("contenuti");
-		$this->attr[] = $this->campo_html = new attributo("campo_html");
-		$this->attr[] = $this->anteprima = new attributo("anteprima");
-		$this->attr[] = $this->versione = new attributo("versione", "int");
+		$this->attr[] = $this->scena_id = new attributo("scena_id", "int");
+		$this->attr[] = $this->fascia_oraria_id = new attributo("fascia_oraria_id", "int");
+		$this->attr[] = $this->durata_ms = new attributo("durata_ms", "int");
+		$this->attr[] = $this->sesso = new attributo("sesso");
+		$this->attr[] = $this->eta = new attributo("eta");
+		$this->attr[] = $this->etnia = new attributo("etnia");
+		$this->attr[] = $this->live = new attributo("live", "bool_int");
+		$this->attr[] = $this->data_start = new attributo("data_start", "data_time");
 		$this->attr[] = $this->created_at = new attributo("created_at");
 		$this->attr[] = $this->updated_at = new attributo("updated_at");
 
 		if($id > 0){
 
-			$sql = "SELECT * FROM scene WHERE id = ?";
+			$sql = "SELECT * FROM rel_scene_fascia_oraria WHERE id = ?";
 			$dati_query = array($this->id);
 
 			$arr = $this->connessione()->query_risultati($sql, $dati_query);
@@ -432,14 +397,14 @@ class base_scene {
 
 				$this->exist = true;
 
-				$this->nome->set_valore($arr[0]["nome"]);
-				$this->tipo_scena_id->set_valore($arr[0]["tipo_scena_id"]);
-				$this->link->set_valore($arr[0]["link"]);
-				$this->token->set_valore($arr[0]["token"]);
-				$this->contenuti->set_valore($arr[0]["contenuti"]);
-				$this->campo_html->set_valore($arr[0]["campo_html"]);
-				$this->anteprima->set_valore($arr[0]["anteprima"]);
-				$this->versione->set_valore($arr[0]["versione"]);
+				$this->scena_id->set_valore($arr[0]["scena_id"]);
+				$this->fascia_oraria_id->set_valore($arr[0]["fascia_oraria_id"]);
+				$this->durata_ms->set_valore($arr[0]["durata_ms"]);
+				$this->sesso->set_valore($arr[0]["sesso"]);
+				$this->eta->set_valore($arr[0]["eta"]);
+				$this->etnia->set_valore($arr[0]["etnia"]);
+				$this->live->set_valore($arr[0]["live"]);
+				$this->data_start->set_valore($arr[0]["data_start"]);
 				$this->created_at->set_valore($arr[0]["created_at"]);
 				$this->updated_at->set_valore($arr[0]["updated_at"]);
 		
@@ -490,7 +455,7 @@ class base_scene {
 			$log = new classe_log();
 
 			if($log->enabled()){
-				$log->set_nome_azione("delete scene");
+				$log->set_nome_azione("delete rel_scene_fascia_oraria");
 				$log->set_tipo_azione("delete");
 				$log->set_info("id: ".$this->id); //informazioni aggiuntive
 				
@@ -623,17 +588,17 @@ class base_scene {
 			//andiamo a inserire le informazioni nel db
 			if($this->id == 0){
 
-				$sql = "INSERT INTO scene (nome, tipo_scena_id, link, token, contenuti, campo_html, anteprima, versione, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+				$sql = "INSERT INTO rel_scene_fascia_oraria (scena_id, fascia_oraria_id, durata_ms, sesso, eta, etnia, live, data_start, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 				$dati_query = array(
-								$this->nome->get_valore(99), 
-								$this->tipo_scena_id->get_valore(99), 
-								$this->link->get_valore(99), 
-								$this->token->get_valore(99), 
-								$this->contenuti->get_valore(99), 
-								$this->campo_html->get_valore(99), 
-								$this->anteprima->get_valore(99), 
-								$this->versione->get_valore(99), 
+								$this->scena_id->get_valore(99), 
+								$this->fascia_oraria_id->get_valore(99), 
+								$this->durata_ms->get_valore(99), 
+								$this->sesso->get_valore(99), 
+								$this->eta->get_valore(99), 
+								$this->etnia->get_valore(99), 
+								$this->live->get_valore(99), 
+								$this->data_start->get_valore(99), 
 								$this->created_at->get_valore(99), 
 								$this->updated_at->get_valore(99)
 							);
@@ -652,7 +617,7 @@ class base_scene {
 					$log = new classe_log();
 
 					if($log->enabled()){
-						$log->set_nome_azione("insert scene");
+						$log->set_nome_azione("insert rel_scene_fascia_oraria");
 						$log->set_tipo_azione("insert");
 						$log->set_info("id: ".$this->id); //informazioni aggiuntive
 						
@@ -666,18 +631,18 @@ class base_scene {
 
 			}else{//aggiorniamo l'oggetto
 
-				$sql = "UPDATE scene SET nome = ?, tipo_scena_id = ?, link = ?, token = ?, contenuti = ?, campo_html = ?, anteprima = ?, versione = ?, created_at = ?, updated_at = ?"
+				$sql = "UPDATE rel_scene_fascia_oraria SET scena_id = ?, fascia_oraria_id = ?, durata_ms = ?, sesso = ?, eta = ?, etnia = ?, live = ?, data_start = ?, created_at = ?, updated_at = ?"
 						." WHERE id = ?";
 
 				$dati_query = array(
-								$this->nome->get_valore(99), 
-								$this->tipo_scena_id->get_valore(99), 
-								$this->link->get_valore(99), 
-								$this->token->get_valore(99), 
-								$this->contenuti->get_valore(99), 
-								$this->campo_html->get_valore(99), 
-								$this->anteprima->get_valore(99), 
-								$this->versione->get_valore(99), 
+								$this->scena_id->get_valore(99), 
+								$this->fascia_oraria_id->get_valore(99), 
+								$this->durata_ms->get_valore(99), 
+								$this->sesso->get_valore(99), 
+								$this->eta->get_valore(99), 
+								$this->etnia->get_valore(99), 
+								$this->live->get_valore(99), 
+								$this->data_start->get_valore(99), 
 								$this->created_at->get_valore(99), 
 								$this->updated_at->get_valore(99), 
 								$this->id
@@ -696,7 +661,7 @@ class base_scene {
 					$log = new classe_log();
 
 					if($log->enabled()){
-						$log->set_nome_azione("update scene");
+						$log->set_nome_azione("update rel_scene_fascia_oraria");
 						$log->set_tipo_azione("update");
 						$log->set_info("id: ".$this->id); //informazioni aggiuntive
 						
@@ -728,82 +693,82 @@ class base_scene {
 	
 	/**
 	 * 
-	 * @param string $nome
+	 * @param string $scena_id
 	 * @return boolean true se il valore e' corretto, false altrimenti
 	 */
-	public function set_nome($nome) {
-		$this->nome->set_valore($nome);
-		return $this->nome->is_corretto();
+	public function set_scena_id($scena_id) {
+		$this->scena_id->set_valore($scena_id);
+		return $this->scena_id->is_corretto();
 	}
 	
 	/**
 	 * 
-	 * @param string $tipo_scena_id
+	 * @param string $fascia_oraria_id
 	 * @return boolean true se il valore e' corretto, false altrimenti
 	 */
-	public function set_tipo_scena_id($tipo_scena_id) {
-		$this->tipo_scena_id->set_valore($tipo_scena_id);
-		return $this->tipo_scena_id->is_corretto();
+	public function set_fascia_oraria_id($fascia_oraria_id) {
+		$this->fascia_oraria_id->set_valore($fascia_oraria_id);
+		return $this->fascia_oraria_id->is_corretto();
 	}
 	
 	/**
 	 * 
-	 * @param string $link
+	 * @param string $durata_ms
 	 * @return boolean true se il valore e' corretto, false altrimenti
 	 */
-	public function set_link($link) {
-		$this->link->set_valore($link);
-		return $this->link->is_corretto();
+	public function set_durata_ms($durata_ms) {
+		$this->durata_ms->set_valore($durata_ms);
+		return $this->durata_ms->is_corretto();
 	}
 	
 	/**
 	 * 
-	 * @param string $token
+	 * @param string $sesso
 	 * @return boolean true se il valore e' corretto, false altrimenti
 	 */
-	public function set_token($token) {
-		$this->token->set_valore($token);
-		return $this->token->is_corretto();
+	public function set_sesso($sesso) {
+		$this->sesso->set_valore($sesso);
+		return $this->sesso->is_corretto();
 	}
 	
 	/**
 	 * 
-	 * @param string $contenuti
+	 * @param string $eta
 	 * @return boolean true se il valore e' corretto, false altrimenti
 	 */
-	public function set_contenuti($contenuti) {
-		$this->contenuti->set_valore($contenuti);
-		return $this->contenuti->is_corretto();
+	public function set_eta($eta) {
+		$this->eta->set_valore($eta);
+		return $this->eta->is_corretto();
 	}
 	
 	/**
 	 * 
-	 * @param string $campo_html
+	 * @param string $etnia
 	 * @return boolean true se il valore e' corretto, false altrimenti
 	 */
-	public function set_campo_html($campo_html) {
-		$this->campo_html->set_valore($campo_html);
-		return $this->campo_html->is_corretto();
+	public function set_etnia($etnia) {
+		$this->etnia->set_valore($etnia);
+		return $this->etnia->is_corretto();
 	}
 	
 	/**
 	 * 
-	 * @param string $anteprima
+	 * @param string $live
 	 * @return boolean true se il valore e' corretto, false altrimenti
 	 */
-	public function set_anteprima($anteprima) {
-		$this->anteprima->set_valore($anteprima);
-		return $this->anteprima->is_corretto();
+	public function set_live($live) {
+		$this->live->set_valore($live);
+		return $this->live->is_corretto();
 	}
 	
 	/**
 	 * 
-	 * @param string $versione
+	 * @param string $data_start
 	 * @return boolean true se il valore e' corretto, false altrimenti
 	 */
-	public function set_versione($versione) {
-		$this->versione->set_valore($versione);
-		return $this->versione->is_corretto();
+	public function set_data_start($data_start) {
+		$this->data_start->set_valore($data_start);
+		return $this->data_start->is_corretto();
 	}
 	
 	/**
@@ -839,36 +804,36 @@ class base_scene {
 		return $this->id;
 	}
 	
-	public function get_nome($formattazione_dato = 1) {
-		return $this->nome->get_valore($formattazione_dato);
+	public function get_scena_id($formattazione_dato = 1) {
+		return $this->scena_id->get_valore($formattazione_dato);
 	}
 	
-	public function get_tipo_scena_id($formattazione_dato = 1) {
-		return $this->tipo_scena_id->get_valore($formattazione_dato);
+	public function get_fascia_oraria_id($formattazione_dato = 1) {
+		return $this->fascia_oraria_id->get_valore($formattazione_dato);
 	}
 	
-	public function get_link($formattazione_dato = 1) {
-		return $this->link->get_valore($formattazione_dato);
+	public function get_durata_ms($formattazione_dato = 1) {
+		return $this->durata_ms->get_valore($formattazione_dato);
 	}
 	
-	public function get_token($formattazione_dato = 1) {
-		return $this->token->get_valore($formattazione_dato);
+	public function get_sesso($formattazione_dato = 1) {
+		return $this->sesso->get_valore($formattazione_dato);
 	}
 	
-	public function get_contenuti($formattazione_dato = 1) {
-		return $this->contenuti->get_valore($formattazione_dato);
+	public function get_eta($formattazione_dato = 1) {
+		return $this->eta->get_valore($formattazione_dato);
 	}
 	
-	public function get_campo_html($formattazione_dato = 1) {
-		return $this->campo_html->get_valore($formattazione_dato);
+	public function get_etnia($formattazione_dato = 1) {
+		return $this->etnia->get_valore($formattazione_dato);
 	}
 	
-	public function get_anteprima($formattazione_dato = 1) {
-		return $this->anteprima->get_valore($formattazione_dato);
+	public function get_live($formattazione_dato = 1) {
+		return $this->live->get_valore($formattazione_dato);
 	}
 	
-	public function get_versione($formattazione_dato = 1) {
-		return $this->versione->get_valore($formattazione_dato);
+	public function get_data_start($formattazione_dato = 1) {
+		return $this->data_start->get_valore($formattazione_dato);
 	}
 	
 	public function get_created_at($formattazione_dato = 1) {

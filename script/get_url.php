@@ -6,13 +6,34 @@ init_sessione();
 $conn = new DB_PDO();
 
 
+$sql = "SELECT * FROM dispositivi where numero_serie = ?";
+$dati_query = array(SERIALE);
+$arr = $conn->query_risultati($sql,$dati_query);
+
+if (count($arr)==0){
+	//mando alla registrazione
+	
+	$arr_return = array("url"=>URL_RASPBERRY."/registrazione.php","durata"=>"10", "code"=>"-1", "status"=>"OK");
+
+	echo json_encode($arr_return);
+
+	die();
+}
+
 
 $cambio_scena = true;
 
+
+
+$palinsesto_id = $arr[0]["palinsesto_id"]; 
+
+
 //per prima cosa vediamo se c'è qualcosa in corso, se non c'è nulla poi passiamo a capire cosa trasmettere.
 
-$sql = "SELECT * FROM scene where live = 1";
-$arr = $conn->query_risultati($sql);
+$sql = "SELECT rel_scene_fascia_oraria.id as id_rel, rel_scene_fascia_oraria.* FROM fascia_oraria JOIN rel_scene_fascia_oraria on fascia_oraria.id = rel_scene_fascia_oraria.fascia_oraria_id where palinsesto_id = ? and live = 1 and ora_inizio <= ?  and ora_fine >= ?";
+$dati_query = array($palinsesto_id, date("H:i:00"), date("H:i:00"));
+$arr = $conn->query_risultati($sql,$dati_query);
+
 
 if (count($arr)>0){
 	//vediamo da quanto è in corso
@@ -22,12 +43,18 @@ if (count($arr)>0){
 	
 	$diff = $adesso-$start_time;
 	
-	if($diff<$arr[0]["durata"]){
+	if($diff< ($arr[0]["durata_ms"]/1000)){
 		//va bene così
 		
-		$url = $arr[0]["url"];
-		$code = $arr[0]["id"];
-		$durata = $arr[0]["durata"];
+		$fascia_scena_obj = new classe_rel_scene_fascia_oraria($arr[0]["id_rel"]);
+		
+		
+		$scena_obj = new classe_scene($arr[0]["scena_id"]);
+		$url = $scena_obj->genera_url();
+		$code = $scena_obj->get_id();
+		$durata = $fascia_scena_obj->get_durata_ms();
+		
+
 		
 		$cambio_scena = false;
 	}else{
@@ -43,7 +70,7 @@ if($cambio_scena){
 	//dobbiamo prima valutare se è subentrato un evento.
 	//in assenza di eventi mettiamo la scena di default.
 	
-	$sql = "SELECT * FROM log_eventi where processato = 0 order by data_evento DESC";
+	$sql = "SELECT * FROM log_eventi_rpi where processato = 0 order by data_evento DESC";
 	$arr = $conn->query_risultati($sql);
 	
 
@@ -243,24 +270,30 @@ if($cambio_scena){
 	
 	if (count($arr)==0 || $cambio_scena){
 		//cerco una scena di default
-		$sql = "SELECT * FROM scene where genere is null and eta is null and razza is null order by data_start ASC";
-		$arr = $conn->query_risultati($sql);
+		$sql = "SELECT rel_scene_fascia_oraria.id as id_rel, scene.*, rel_scene_fascia_oraria.* FROM fascia_oraria JOIN rel_scene_fascia_oraria on fascia_oraria.id = rel_scene_fascia_oraria.fascia_oraria_id"
+				. " JOIN scene on rel_scene_fascia_oraria.scena_id = scene.id "
+				. " where palinsesto_id = ? and ora_inizio <= ? and ora_fine >=? order by data_start ASC";
+		$dati_query = array($palinsesto_id, date("H:i:00"), date("H:i:00"));
+		
+		//echo $conn->debug_query($sql, $dati_query);
+		
+		$arr = $conn->query_risultati($sql, $dati_query);
 
 		if (count($arr)>0){
 			
-			$sql = "UPDATE scene set live = 0";
+			$sql = "UPDATE rel_scene_fascia_oraria set live = 0";
 			$conn->esegui_query($sql);
 			
-			$scena_obj = new classe_scene($arr[0]["id"]);
-			$scena_obj->set_live(1);
-			$scena_obj->set_data_start(date("Y-m-d H:i:s"));
-			$esito = $scena_obj->salva(FALSE);
+			$fascia_scena_obj = new classe_rel_scene_fascia_oraria($arr[0]["id_rel"]);
+			$fascia_scena_obj->set_live(1);
+			$fascia_scena_obj->set_data_start(date("Y-m-d H:i:s"));
+			$esito = $fascia_scena_obj->salva(FALSE);
 			
 			//var_dump($esito);
-			
-			$url = $scena_obj->get_url();
+			$scena_obj = new classe_scene($arr[0]["scena_id"]);
+			$url = $scena_obj->genera_url();
 			$code = $scena_obj->get_id();
-			$durata = $scena_obj->get_durata();
+			$durata = $fascia_scena_obj->get_durata_ms();
 		}
 	}
 	

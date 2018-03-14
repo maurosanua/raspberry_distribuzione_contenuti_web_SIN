@@ -128,5 +128,5 @@ if(is_dir("pdf/")){
 
 
 
-
+define ("SERIALE", "00000000ae9d38d5");
 ?>
