@@ -1,0 +1,17 @@
+web.config
+nbproject
+test_*
+Thumbs.db
+*/Thumbs.db
+include/conf.php
+*/include/conf.php
+
+JSM_Libraries/bin
+JSM_Libraries/obj
+JSM_Libraries.suo
+loaded_files/*
+*.idea
+include/conf.py
+*.pyc
+plugin/phantomJS/pdf/*.pdf
+/.project
