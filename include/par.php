@@ -127,6 +127,9 @@ if(is_dir("pdf/")){
 }
 
 
+define("IMAGES_DIR", "contents/images");
+define("VIDEO_DIR", "contents/video");
+
 
 define ("SERIALE", "00000000ae9d38d5");
 ?>
