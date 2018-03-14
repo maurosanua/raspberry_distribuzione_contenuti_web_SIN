@@ -23,6 +23,9 @@ if (count($arr)==0){
 
 $cambio_scena = true;
 $scena_base = false;
+$url = "";
+$durata = "";
+$code = 0;
 
 
 $palinsesto_id = $arr[0]["palinsesto_id"]; 
@@ -44,6 +47,7 @@ if (count($arr)>0){
 	$diff = $adesso-$start_time;
 	
 	if($diff< ($arr[0]["durata_ms"]/1000)){
+		//echo($arr[0]["data_start"]);
 		//va bene così
 		
 		$fascia_scena_obj = new classe_rel_scene_fascia_oraria($arr[0]["id_rel"]);
@@ -60,7 +64,7 @@ if (count($arr)>0){
 		
 		if (strlen($fascia_scena_obj->get_sesso())==0 && count($etnia)==0 && count($eta)==0){
 			//sto eseguento una scena generica
-			$cambio_scena = true;
+			$cambio_scena = false;
 			$scena_base = true;
 		}else{
 			$cambio_scena = false;
