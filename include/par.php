@@ -130,6 +130,6 @@ if(is_dir("pdf/")){
 define("IMAGES_DIR", "contents/images");
 define("VIDEO_DIR", "contents/video");
 
-define('SERIAL_NUMBER_KEY','jsm_serial_key');
+define('SERIAL_NUMBER_KEY','jsm_serial_key_asd23Mdir03162018'); //stringa lunga 32 char
 define ("SERIALE", "00000000ae9d38d5");
 ?>
