@@ -29,7 +29,7 @@ if(count($arr)>0){
 		<title>Rasp-url</title>
 	</head>
 	<body style="margin: 0px;overflow: hidden;">
-		<iframe id="iframe1" src="blanck.php" style="width:<?=$larghezza?>px;height:<?=$altezza?>px;overflow:hidden;overflow-y: scroll;" frameBorder="0"></iframe> 
+		<iframe id="iframe1" src="blanck.php" data-id="" style="width:<?=$larghezza?>px;height:<?=$altezza?>px;overflow:hidden;overflow-y: scroll;" frameBorder="0"></iframe> 
 
 
 
@@ -64,10 +64,13 @@ function aggiorna_url(){
 		
 		dataType: "json",
 		success: function (json_risposta) {
+			console.log(json_risposta);
 			if (json_risposta.status === "OK"){
+
 				if(json_risposta.code != url_code){
+					
 					url_code = json_risposta.code;
-					change_url(json_risposta.url);
+					change_url(json_risposta.url, url_code);
 				}
 			}else{
 			}
@@ -83,16 +86,15 @@ function aggiorna_url(){
  
 
 function aggiorna_loop(){
-	aggiorna_url()
-	setTimeout(function(){ aggiorna_loop(); }, 3000);
+	aggiorna_url();
+	setTimeout(function(){ aggiorna_loop(); }, 1000);
 }
  
 aggiorna_loop();
 
 
 
-function change_url(url){
-	
+function change_url(url, code){
 	$('#iframe1').fadeOut(500,function(){
 		$('#iframe1').attr('src',url ).load(function(){
 			$(this).fadeIn(1000);    
