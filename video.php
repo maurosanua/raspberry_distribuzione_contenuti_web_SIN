@@ -19,6 +19,7 @@ $conn->Close();
 	</head>
 	<body style="margin: 0px;">
 		<video width="100%" autoplay loop>
+			<!--<source src="http://contents/video/<?//=$contenuto?>" type="video/mp4">-->
 			<source src="contents/video/<?=$contenuto?>" type="video/mp4">
 
 		  Your browser does not support the video tag.
