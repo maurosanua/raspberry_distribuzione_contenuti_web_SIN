@@ -15,33 +15,34 @@ file_put_contents('../request_data/request.txt', $data, FILE_APPEND);
 
 $arr_persone = json_decode($data,true);
 
-$sql = "SELECT id from log_eventi where processato = 0";
+$sql = "SELECT id from log_eventi_rpi where processato = 0";
 $arr_res = $conn->query_risultati($sql);
 $arr_log = array();
 foreach($arr_res as $id){
-    $arr_log[] = new classe_log_eventi($id[0]);
+    $arr_log[] = new classe_log_eventi_rpi($id[0]);
 }
 
-
-foreach($arr_persone["Audience"] as $persona){
-    $trovato = false;
-    foreach($arr_log as $log_evento){
-        if($persona["ID"]==$log_evento->get_camera_id(0)){
-            unset($log_evento);
-            $trovato = true;
-            break;
+if(isset($arr_persone["Audience"]) && is_array($arr_persone["Audience"])){
+    foreach($arr_persone["Audience"] as $persona){
+        $trovato = false;
+        foreach($arr_log as $log_evento){
+            if($persona["ID"]==$log_evento->get_camera_id(0)){
+                unset($log_evento);
+                $trovato = true;
+                break;
+            }
         }
-    }
-    if(!$trovato){
-        $nuovo_evento = new classe_log_eventi();
-        $nuovo_evento->set_data_evento(substr($arr_persone["PostDateTime"],0,10)." ".substr($arr_persone["PostDateTime"],11));
-        $nuovo_evento->set_genere($persona["Gender"]);
-        $nuovo_evento->set_eta($persona["AgeGroup"]);
-        $nuovo_evento->set_razza($persona["Race"]);
-        $nuovo_evento->set_processato(0);
-        $nuovo_evento->set_camera_id($persona["ID"]);
-        $nuovo_evento->set_appearance_datetime(substr($persona["AppearanceDateTime"],0,10)." ".substr($persona["AppearanceDateTime"],11));
-        $nuovo_evento->salva(false);
+        if(!$trovato){
+            $nuovo_evento = new classe_log_eventi_rpi();
+            $nuovo_evento->set_data_evento(substr($arr_persone["PostDateTime"],0,10)." ".substr($arr_persone["PostDateTime"],11));
+            $nuovo_evento->set_genere($persona["Gender"]);
+            $nuovo_evento->set_eta($persona["AgeGroup"]);
+            $nuovo_evento->set_etnia($persona["Race"]);
+            $nuovo_evento->set_processato(0);
+            $nuovo_evento->set_camera_id($persona["ID"]);
+            $nuovo_evento->set_appearance_datetime(substr($persona["AppearanceDateTime"],0,10)." ".substr($persona["AppearanceDateTime"],11));
+            $nuovo_evento->salva(false);
+        }
     }
 }
 
