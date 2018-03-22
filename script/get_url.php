@@ -92,7 +92,7 @@ if($cambio_scena){
 	if (count($arr)>0){
 		
 		
-		
+		$log_evento_rpi = new classe_log_eventi_rpi($arr[0]["id"]);
 		
 		$razza = $arr[0]["etnia"];
 		$eta = $arr[0]["eta"];
@@ -141,8 +141,11 @@ if($cambio_scena){
 					$scene_live_obj->set_live(1);
 					$scene_live_obj->set_data_start(date("Y-m-d H:i:s"));
 					$esito = $scene_live_obj->salva(FALSE);
+					if($esito){
+						$log_evento_rpi->set_processato(1);
+					}
 					$fascia_scena_obj = new classe_rel_scene_fascia_oraria($arr[0]["id_rel"]);
-		
+					
 					
 
 					//var_dump($esito);
@@ -184,6 +187,10 @@ if($cambio_scena){
 					$scene_live_obj->set_live(1);
 					$scene_live_obj->set_data_start(date("Y-m-d H:i:s"));
 					$esito = $scene_live_obj->salva(FALSE);
+					if($esito){
+						$log_evento_rpi->set_processato(1);
+					}
+
 					$fascia_scena_obj = new classe_rel_scene_fascia_oraria($arr[0]["id_rel"]);
 		
 					
@@ -295,6 +302,9 @@ if($cambio_scena){
 					$scene_live_obj->set_live(1);
 					$scene_live_obj->set_data_start(date("Y-m-d H:i:s"));
 					$esito = $scene_live_obj->salva(FALSE);
+					if($esito){
+						$log_evento_rpi->set_processato(1);
+					}
 					$fascia_scena_obj = new classe_rel_scene_fascia_oraria($arr[0]["id_rel"]);
 		
 					
