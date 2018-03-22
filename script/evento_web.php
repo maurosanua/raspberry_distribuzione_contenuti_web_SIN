@@ -10,6 +10,7 @@ $tipo = isset($_GET["tipo"])?$_GET["tipo"]:"";
 echo $tipo;
 
 $log_obj = new classe_log_eventi_rpi();
+$log_obj->set_camera_id(null);
 $log_obj->set_data_evento(date("Y-m-d H:i:s"));
 $log_obj->set_processato(0);
 

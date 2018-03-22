@@ -33,9 +33,10 @@ $palinsesto_id = $arr[0]["palinsesto_id"];
 
 //per prima cosa vediamo se c'è qualcosa in corso, se non c'è nulla poi passiamo a capire cosa trasmettere.
 
-$sql = "SELECT rel_scene_fascia_oraria.id as id_rel, rel_scene_fascia_oraria.* FROM fascia_oraria JOIN rel_scene_fascia_oraria on fascia_oraria.id = rel_scene_fascia_oraria.fascia_oraria_id where palinsesto_id = ? and live = 1 and ora_inizio <= ?  and ora_fine >= ?";
+$sql = "SELECT rel_scene_fascia_oraria.id as id_rel, rel_scene_fascia_oraria.*, scene_live.* FROM fascia_oraria JOIN rel_scene_fascia_oraria on fascia_oraria.id = rel_scene_fascia_oraria.fascia_oraria_id LEFT JOIN scene_live on scene_live.rif_rel_fascia_scene = rel_scene_fascia_oraria.id where palinsesto_id = ? and scene_live.live = 1 and ora_inizio <= ?  and ora_fine >= ?";
 $dati_query = array($palinsesto_id, date("H:i:00"), date("H:i:00"));
 $arr = $conn->query_risultati($sql,$dati_query);
+
 
 
 if (count($arr)>0){
@@ -64,7 +65,7 @@ if (count($arr)>0){
 		
 		if (strlen($fascia_scena_obj->get_sesso())==0 && count($etnia)==0 && count($eta)==0){
 			//sto eseguento una scena generica
-			$cambio_scena = false;
+			$cambio_scena = true;
 			$scena_base = true;
 		}else{
 			$cambio_scena = false;
@@ -89,7 +90,7 @@ if($cambio_scena){
 	
 
 	if (count($arr)>0){
-		//echo "qui";
+		
 		
 		
 		
@@ -115,10 +116,10 @@ if($cambio_scena){
 			//vediamo se li matcha tutti
 			if($cambio_scena){
 				
-				$sql = "SELECT rel_scene_fascia_oraria.id as id_rel, scene.*, rel_scene_fascia_oraria.* FROM fascia_oraria JOIN rel_scene_fascia_oraria on fascia_oraria.id = rel_scene_fascia_oraria.fascia_oraria_id"
+				$sql = "SELECT scene_live.id as id_scene_live, rel_scene_fascia_oraria.id as id_rel, scene.*, rel_scene_fascia_oraria.*, scene_live.* FROM fascia_oraria JOIN rel_scene_fascia_oraria on fascia_oraria.id = rel_scene_fascia_oraria.fascia_oraria_id LEFT JOIN scene_live on scene_live.rif_rel_fascia_scene = rel_scene_fascia_oraria.id "
 				. " JOIN scene on rel_scene_fascia_oraria.scena_id = scene.id "
-				. " where palinsesto_id = ? and ora_inizio <= ? and ora_fine >=? and sesso = ? and eta like ? and etnia like ? and live = 0"
-				. " order by data_start ASC";
+				. " where palinsesto_id = ? and ora_inizio <= ? and ora_fine >=? and sesso = ? and eta like ? and etnia like ? and ( scene_live.live = 0 or scene_live.live IS NULL)"
+				. " order by scene_live.data_start ASC";
 				$dati_query = array($palinsesto_id, date("H:i:00"), date("H:i:00"),$genere, "%".$eta."%", "%".$razza."%");
 				
 				//echo $conn->debug_query($sql, $dati_query);
@@ -128,13 +129,21 @@ if($cambio_scena){
 				if (count($arr)>0){
 					$cambio_scena = false;
 
-					$sql = "UPDATE rel_scene_fascia_oraria set live = 0";
+					$sql = "UPDATE scene_live set live = 0";
 					$conn->esegui_query($sql);
-
+					if($arr[0]["id_scene_live"] !== null){
+						$scene_live_obj = new classe_scene_live($arr[0]["id_scene_live"]);
+						
+					}else{
+						$scene_live_obj = new classe_scene_live();
+					}
+					$scene_live_obj->set_rif_rel_fascia_scene( $arr[0]["id_rel"]);
+					$scene_live_obj->set_live(1);
+					$scene_live_obj->set_data_start(date("Y-m-d H:i:s"));
+					$esito = $scene_live_obj->salva(FALSE);
 					$fascia_scena_obj = new classe_rel_scene_fascia_oraria($arr[0]["id_rel"]);
-					$fascia_scena_obj->set_live(1);
-					$fascia_scena_obj->set_data_start(date("Y-m-d H:i:s"));
-					$esito = $fascia_scena_obj->salva(FALSE);
+		
+					
 
 					//var_dump($esito);
 					$scena_obj = new classe_scene($arr[0]["scena_id"]);
@@ -151,10 +160,10 @@ if($cambio_scena){
 				
 
 				
-				$sql = "SELECT rel_scene_fascia_oraria.id as id_rel, scene.*, rel_scene_fascia_oraria.* FROM fascia_oraria JOIN rel_scene_fascia_oraria on fascia_oraria.id = rel_scene_fascia_oraria.fascia_oraria_id"
+				$sql = "SELECT scene_live.id as id_scene_live,rel_scene_fascia_oraria.id as id_rel, scene.*, rel_scene_fascia_oraria.*, scene_live.* FROM fascia_oraria JOIN rel_scene_fascia_oraria on fascia_oraria.id = rel_scene_fascia_oraria.fascia_oraria_id LEFT JOIN scene_live on scene_live.rif_rel_fascia_scene = rel_scene_fascia_oraria.id"
 				. " JOIN scene on rel_scene_fascia_oraria.scena_id = scene.id "
-				. " where palinsesto_id = ? and ora_inizio <= ? and ora_fine >=? and sesso = ? and eta like ? and live = 0"
-				. " order by data_start ASC";
+				. " where palinsesto_id = ? and ora_inizio <= ? and ora_fine >=? and sesso = ? and eta like ? and ( scene_live.live = 0 or scene_live.live IS NULL)"
+				. " order by scene_live.data_start ASC";
 				$dati_query = array($palinsesto_id, date("H:i:00"), date("H:i:00"),$genere, "%".$eta."%");
 				
 				
@@ -163,13 +172,21 @@ if($cambio_scena){
 				if (count($arr)>0){
 					$cambio_scena = false;
 
-					$sql = "UPDATE rel_scene_fascia_oraria set live = 0";
+					$sql = "UPDATE scene_live set live = 0";
 					$conn->esegui_query($sql);
-
+					if($arr[0]["id_scene_live"] !== null){
+						$scene_live_obj = new classe_scene_live($arr[0]["id_scene_live"]);
+						
+					}else{
+						$scene_live_obj = new classe_scene_live();
+					}
+					$scene_live_obj->set_rif_rel_fascia_scene( $arr[0]["id_rel"]);
+					$scene_live_obj->set_live(1);
+					$scene_live_obj->set_data_start(date("Y-m-d H:i:s"));
+					$esito = $scene_live_obj->salva(FALSE);
 					$fascia_scena_obj = new classe_rel_scene_fascia_oraria($arr[0]["id_rel"]);
-					$fascia_scena_obj->set_live(1);
-					$fascia_scena_obj->set_data_start(date("Y-m-d H:i:s"));
-					$esito = $fascia_scena_obj->salva(FALSE);
+		
+					
 
 					//var_dump($esito);
 					$scena_obj = new classe_scene($arr[0]["scena_id"]);
@@ -252,10 +269,10 @@ if($cambio_scena){
 			if($cambio_scena){
 				//vediamo se almeno ce ne è uno
 			
-				$sql = "SELECT rel_scene_fascia_oraria.id as id_rel, scene.*, rel_scene_fascia_oraria.* FROM fascia_oraria JOIN rel_scene_fascia_oraria on fascia_oraria.id = rel_scene_fascia_oraria.fascia_oraria_id"
+				$sql = "SELECT scene_live.id as id_scene_live, rel_scene_fascia_oraria.id as id_rel, scene.*, rel_scene_fascia_oraria.*, scene_live.* FROM fascia_oraria JOIN rel_scene_fascia_oraria on fascia_oraria.id = rel_scene_fascia_oraria.fascia_oraria_id LEFT JOIN scene_live on scene_live.rif_rel_fascia_scene = rel_scene_fascia_oraria.id"
 				. " JOIN scene on rel_scene_fascia_oraria.scena_id = scene.id "
-				. " where palinsesto_id = ? and ora_inizio <= ? and ora_fine >=? and (sesso = ? or eta like ? or etnia like ?) and live = 0"
-				. " order by data_start ASC";
+				. " where palinsesto_id = ? and ora_inizio <= ? and ora_fine >=? and (sesso = ? or eta like ? or etnia like ?) and ( scene_live.live = 0 or scene_live.live IS NULL)"
+				. " order by scene_live.data_start ASC";
 				$dati_query = array($palinsesto_id, date("H:i:00"), date("H:i:00"),$genere, "%".$eta."%", "%".$razza."%");
 				
 //				echo $conn->debug_query($sql, $dati_query);
@@ -266,13 +283,21 @@ if($cambio_scena){
 				if (count($arr)>0){
 					$cambio_scena = false;
 
-					$sql = "UPDATE rel_scene_fascia_oraria set live = 0";
+					$sql = "UPDATE scene_live set live = 0";
 					$conn->esegui_query($sql);
-
+					if($arr[0]["id_scene_live"] !== null){
+						$scene_live_obj = new classe_scene_live($arr[0]["id_scene_live"]);
+						
+					}else{
+						$scene_live_obj = new classe_scene_live();
+					}
+					$scene_live_obj->set_rif_rel_fascia_scene( $arr[0]["id_rel"]);
+					$scene_live_obj->set_live(1);
+					$scene_live_obj->set_data_start(date("Y-m-d H:i:s"));
+					$esito = $scene_live_obj->salva(FALSE);
 					$fascia_scena_obj = new classe_rel_scene_fascia_oraria($arr[0]["id_rel"]);
-					$fascia_scena_obj->set_live(1);
-					$fascia_scena_obj->set_data_start(date("Y-m-d H:i:s"));
-					$esito = $fascia_scena_obj->salva(FALSE);
+		
+					
 
 					//var_dump($esito);
 					$scena_obj = new classe_scene($arr[0]["scena_id"]);
@@ -293,33 +318,42 @@ if($cambio_scena){
 	}
 	
 	if (count($arr)==0 || ($cambio_scena && !$scena_base)){
-		//echo "qui";
+		//echo "quiasda";
 		//cerco una scena di default
-		$sql = "SELECT rel_scene_fascia_oraria.id as id_rel, scene.*, rel_scene_fascia_oraria.* FROM fascia_oraria JOIN rel_scene_fascia_oraria on fascia_oraria.id = rel_scene_fascia_oraria.fascia_oraria_id"
+		$sql = "SELECT scene_live.id as id_scene_live, rel_scene_fascia_oraria.id as id_rel, scene.*, rel_scene_fascia_oraria.*, scene_live.* FROM fascia_oraria JOIN rel_scene_fascia_oraria on fascia_oraria.id = rel_scene_fascia_oraria.fascia_oraria_id LEFT JOIN scene_live on scene_live.rif_rel_fascia_scene = rel_scene_fascia_oraria.id"
 				. " JOIN scene on rel_scene_fascia_oraria.scena_id = scene.id "
 				. " where palinsesto_id = ? and ora_inizio <= ? and ora_fine >=? and sesso is null and etnia = '[]' and eta = '[]'"
-				. "order by data_start ASC";
+				. "order by scene_live.data_start ASC";
 		$dati_query = array($palinsesto_id, date("H:i:00"), date("H:i:00"));
 		
 		//echo $conn->debug_query($sql, $dati_query);
 		
 		$arr = $conn->query_risultati($sql, $dati_query);
-
+		
 		if (count($arr)>0){
 			
-			$sql = "UPDATE rel_scene_fascia_oraria set live = 0";
+			$sql = "UPDATE scene_live set live = 0";
 			$conn->esegui_query($sql);
 			
+			if($arr[0]["id_scene_live"] !== null){
+				$scene_live_obj = new classe_scene_live($arr[0]["id_scene_live"]);
+				
+			}else{
+				$scene_live_obj = new classe_scene_live();
+			}
+			$scene_live_obj->set_rif_rel_fascia_scene( $arr[0]["id_rel"]);
+			$scene_live_obj->set_live(1);
+			$scene_live_obj->set_data_start(date("Y-m-d H:i:s"));
+			$esito = $scene_live_obj->salva(FALSE);
 			$fascia_scena_obj = new classe_rel_scene_fascia_oraria($arr[0]["id_rel"]);
-			$fascia_scena_obj->set_live(1);
-			$fascia_scena_obj->set_data_start(date("Y-m-d H:i:s"));
-			$esito = $fascia_scena_obj->salva(FALSE);
-			
+
+
 			//var_dump($esito);
 			$scena_obj = new classe_scene($arr[0]["scena_id"]);
 			$url = $scena_obj->genera_url();
 			$code = $scena_obj->get_id();
-			$durata = $fascia_scena_obj->get_durata_ms();
+			$durata =  $fascia_scena_obj->get_durata_ms();
+			
 		}
 	}
 	

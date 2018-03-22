@@ -317,7 +317,13 @@ class classe_log_eventi_rpi extends base_log_eventi_rpi {
 	/****************
 	 * metodi ad hoc
 	 */
-	 
+	public function salva($make_log = true){
+		$this->set_updated_at(date("Y-m-d H:i:s"));
+		if($this->get_id()==0){
+			$this->set_created_at(date("Y-m-d H:i:s"));
+		}
+		return parent::salva($make_log);
+	}
 
 }
 
