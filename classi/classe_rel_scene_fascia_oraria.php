@@ -317,7 +317,30 @@ class classe_rel_scene_fascia_oraria extends base_rel_scene_fascia_oraria {
 	/****************
 	 * metodi ad hoc
 	 */
-	 
+	public function aggiorna_scene_live($id_scene_live){
+
+
+		$this->connessione()->begin_transaction();
+		$sql = "UPDATE scene_live set live = 0";
+		$this->connessione()->esegui_query($sql);
+		if($id_scene_live !== null){
+			try{
+				$scene_live_obj = new classe_scene_live($id_scene_live);
+			}catch(Exception $e){
+				$scene_live_obj = new classe_scene_live();
+			}	
+		}else{
+			$scene_live_obj = new classe_scene_live();
+		}
+		$scene_live_obj->set_rif_rel_fascia_scene( $this->get_id());
+		$scene_live_obj->set_live(1);
+		$scene_live_obj->set_data_start(date("Y-m-d H:i:s"));
+		$esito = $scene_live_obj->salva(FALSE);
+
+		$this->connessione()->end_transaction($esito);
+		
+		return $esito;
+	}
 
 }
 

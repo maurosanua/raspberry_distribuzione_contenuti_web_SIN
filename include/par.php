@@ -131,5 +131,10 @@ define("IMAGES_DIR", "contents/images");
 define("VIDEO_DIR", "contents/video");
 
 define('SERIAL_NUMBER_KEY','jsm_serial_key_asd23Mdir03162018'); //stringa lunga 32 char
-define ("SERIALE", "00000000ae9d38d5");
+
+/*
+ * abbiamo messo la definizione di SERIALE nel file function, dopo aver definito la funzione che lo recupera
+ */ 
+// define ("SERIALE", "00000000ae9d38d5");
+// define ("SERIALE", rpi_serial_number());
 ?>

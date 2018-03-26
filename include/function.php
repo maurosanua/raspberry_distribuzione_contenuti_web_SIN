@@ -11,6 +11,26 @@ function versione_function(){
  
 
 /**
+ * recupera il numero di serie della cpu della raspberry
+ * 
+ * @return string cpu serial number
+ */ 
+function rpi_serial_number(){
+	
+	$comando = "cat /proc/cpuinfo |grep Serial| awk '{print $3}'";
+	// $comando = "cat /proc/cpuinfo |grep Serial|cut -d' ' -f2";
+
+	$out = trim(shell_exec($comando));
+
+	return $out;
+}
+
+//definiamo qui la costante SERIALE in modo che venga popolata usando la funzione appena definita
+define ("SERIALE", rpi_serial_number());
+
+
+
+/**
  * restituisce il nome del file opportunamente modificato per escludere eventuali caratteri "pericolosi" (spazi compresi)
  * volendo e' possibile specificare un nuovo pattern con cui effettuare la sostituzione
  * 

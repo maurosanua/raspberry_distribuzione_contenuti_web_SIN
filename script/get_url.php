@@ -33,10 +33,11 @@ $palinsesto_id = $arr[0]["palinsesto_id"];
 
 //per prima cosa vediamo se c'è qualcosa in corso, se non c'è nulla poi passiamo a capire cosa trasmettere.
 
-$sql = "SELECT rel_scene_fascia_oraria.id as id_rel, rel_scene_fascia_oraria.*, scene_live.* FROM fascia_oraria JOIN rel_scene_fascia_oraria on fascia_oraria.id = rel_scene_fascia_oraria.fascia_oraria_id LEFT JOIN scene_live on scene_live.rif_rel_fascia_scene = rel_scene_fascia_oraria.id where palinsesto_id = ? and scene_live.live = 1 and ora_inizio <= ?  and ora_fine >= ?";
+$sql = "SELECT scene_live.data_start, rel_scene_fascia_oraria.id as id_rel, rel_scene_fascia_oraria.*, scene_live.* FROM fascia_oraria JOIN rel_scene_fascia_oraria on fascia_oraria.id = rel_scene_fascia_oraria.fascia_oraria_id LEFT JOIN scene_live on scene_live.rif_rel_fascia_scene = rel_scene_fascia_oraria.id where palinsesto_id = ? and scene_live.live = 1 and ora_inizio <= ?  and ora_fine >= ?";
 $dati_query = array($palinsesto_id, date("H:i:00"), date("H:i:00"));
 $arr = $conn->query_risultati($sql,$dati_query);
 
+//var_dump($arr);
 
 
 if (count($arr)>0){
@@ -67,6 +68,7 @@ if (count($arr)>0){
 			//sto eseguento una scena generica
 			$cambio_scena = true;
 			$scena_base = true;
+			
 		}else{
 			$cambio_scena = false;
 		}
@@ -79,24 +81,23 @@ if (count($arr)>0){
 	//echo $diff;
 }
 
-
 if($cambio_scena){
 	
 	//dobbiamo prima valutare se è subentrato un evento.
 	//in assenza di eventi mettiamo la scena di default.
 	
 	$sql = "SELECT * FROM log_eventi_rpi where processato = 0 order by data_evento DESC";
-	$arr = $conn->query_risultati($sql);
+	$arr_eventi = $conn->query_risultati($sql);
 	
 
-	if (count($arr)>0){
+	if (count($arr_eventi)>0){
 		
 		
-		$log_evento_rpi = new classe_log_eventi_rpi($arr[0]["id"]);
+		$log_evento_rpi = new classe_log_eventi_rpi($arr_eventi[0]["id"]);
 		
-		$razza = $arr[0]["etnia"];
-		$eta = $arr[0]["eta"];
-		$genere = $arr[0]["genere"];
+		$razza = $arr_eventi[0]["etnia"];
+		$eta = $arr_eventi[0]["eta"];
+		$genere = $arr_eventi[0]["genere"];
 		
 		if($genere == ""){
 			$genere = null;
@@ -128,30 +129,18 @@ if($cambio_scena){
 
 				if (count($arr)>0){
 					$cambio_scena = false;
-
-					$sql = "UPDATE scene_live set live = 0";
-					$conn->esegui_query($sql);
-					if($arr[0]["id_scene_live"] !== null){
-						$scene_live_obj = new classe_scene_live($arr[0]["id_scene_live"]);
-						
-					}else{
-						$scene_live_obj = new classe_scene_live();
-					}
-					$scene_live_obj->set_rif_rel_fascia_scene( $arr[0]["id_rel"]);
-					$scene_live_obj->set_live(1);
-					$scene_live_obj->set_data_start(date("Y-m-d H:i:s"));
-					$esito = $scene_live_obj->salva(FALSE);
+					$fascia_scena_obj = new classe_rel_scene_fascia_oraria($arr[0]["id_rel"]);
+					
+					$esito = $fascia_scena_obj->aggiorna_scene_live($arr[0]['id_scene_live']);
+					
 					if($esito){
 						$log_evento_rpi->set_processato(1);
-
+						$log_evento_rpi->salva(FALSE);		
 						$log_messe_in_onda = new classe_log_messe_in_onda();
 						$log_messe_in_onda->set_evento_id($log_evento_rpi->get_id());
 						$log_messe_in_onda->set_scena_id($arr[0]["scena_id"]);
-						$log_messe_in_onda->salva(FALSE);
+						$log_messe_in_onda->salva(FALSE);				
 					}
-					$fascia_scena_obj = new classe_rel_scene_fascia_oraria($arr[0]["id_rel"]);
-					
-					
 
 					//var_dump($esito);
 					$scena_obj = new classe_scene($arr[0]["scena_id"]);
@@ -180,30 +169,19 @@ if($cambio_scena){
 				if (count($arr)>0){
 					$cambio_scena = false;
 
-					$sql = "UPDATE scene_live set live = 0";
-					$conn->esegui_query($sql);
-					if($arr[0]["id_scene_live"] !== null){
-						$scene_live_obj = new classe_scene_live($arr[0]["id_scene_live"]);
-						
-					}else{
-						$scene_live_obj = new classe_scene_live();
-					}
-					$scene_live_obj->set_rif_rel_fascia_scene( $arr[0]["id_rel"]);
-					$scene_live_obj->set_live(1);
-					$scene_live_obj->set_data_start(date("Y-m-d H:i:s"));
-					$esito = $scene_live_obj->salva(FALSE);
+					$fascia_scena_obj = new classe_rel_scene_fascia_oraria($arr[0]["id_rel"]);
+					
+					$esito = $fascia_scena_obj->aggiorna_scene_live($arr[0]['id_scene_live']);
+					
 					if($esito){
 						$log_evento_rpi->set_processato(1);
-
+						$log_evento_rpi->salva(FALSE);
 						
 						$log_messe_in_onda = new classe_log_messe_in_onda();
 						$log_messe_in_onda->set_evento_id($log_evento_rpi->get_id());
 						$log_messe_in_onda->set_scena_id($arr[0]["scena_id"]);
 						$log_messe_in_onda->salva(FALSE);
 					}
-
-					$fascia_scena_obj = new classe_rel_scene_fascia_oraria($arr[0]["id_rel"]);
-		
 					
 
 					//var_dump($esito);
@@ -214,72 +192,6 @@ if($cambio_scena){
 				}
 			}
 			
-			
-			/*
-			if($cambio_scena){
-				
-				$sql = "SELECT * FROM scene where (genere is not null or eta is not null or razza is not null) and "
-						. "(genere = ?) and"
-						. "(razza = ?) and"
-						. " live = 0"
-						. " order by data_start ASC";
-				$dati_query = array($genere,  $razza);
-				$arr = $conn->query_risultati($sql, $dati_query);
-
-				if (count($arr)>0){
-					$cambio_scena = false;
-
-					$sql = "UPDATE scene set live = 0";
-					$conn->esegui_query($sql);
-
-					$scena_obj = new classe_scene($arr[0]["id"]);
-					$scena_obj->set_live(1);
-					$scena_obj->set_data_start(date("Y-m-d H:i:s"));
-					$esito = $scena_obj->salva(FALSE);
-
-					//var_dump($esito);
-
-					$url = $scena_obj->get_url();
-					$code = $scena_obj->get_id();
-					$durata = $scena_obj->get_durata();
-				}
-			}
-			*/
-			
-			
-			
-			/*
-			if($cambio_scena){
-				
-				$sql = "SELECT * FROM scene where (genere is not null or eta is not null or razza is not null) and "
-						. "(eta = ?) and"
-						. "(razza = ?) and"
-						. " live = 0"
-						. " order by data_start ASC";
-				$dati_query = array( $eta, $razza);
-				$arr = $conn->query_risultati($sql, $dati_query);
-
-				
-				
-				if (count($arr)>0){
-					$cambio_scena = false;
-
-					$sql = "UPDATE scene set live = 0";
-					$conn->esegui_query($sql);
-
-					$scena_obj = new classe_scene($arr[0]["id"]);
-					$scena_obj->set_live(1);
-					$scena_obj->set_data_start(date("Y-m-d H:i:s"));
-					$esito = $scena_obj->salva(FALSE);
-
-					//var_dump($esito);
-
-					$url = $scena_obj->get_url();
-					$code = $scena_obj->get_id();
-					$durata = $scena_obj->get_durata();
-				}
-			}
-			*/
 			
 			
 			
@@ -301,29 +213,21 @@ if($cambio_scena){
 				if (count($arr)>0){
 					$cambio_scena = false;
 
-					$sql = "UPDATE scene_live set live = 0";
-					$conn->esegui_query($sql);
-					if($arr[0]["id_scene_live"] !== null){
-						$scene_live_obj = new classe_scene_live($arr[0]["id_scene_live"]);
-						
-					}else{
-						$scene_live_obj = new classe_scene_live();
-					}
-					$scene_live_obj->set_rif_rel_fascia_scene( $arr[0]["id_rel"]);
-					$scene_live_obj->set_live(1);
-					$scene_live_obj->set_data_start(date("Y-m-d H:i:s"));
-					$esito = $scene_live_obj->salva(FALSE);
+					$fascia_scena_obj = new classe_rel_scene_fascia_oraria($arr[0]["id_rel"]);
+					
+					$esito = $fascia_scena_obj->aggiorna_scene_live($arr[0]['id_scene_live']);
+					
 					if($esito){
 						$log_evento_rpi->set_processato(1);
-
+						$log_evento_rpi->salva(FALSE);
 						
 						$log_messe_in_onda = new classe_log_messe_in_onda();
 						$log_messe_in_onda->set_evento_id($log_evento_rpi->get_id());
 						$log_messe_in_onda->set_scena_id($arr[0]["scena_id"]);
 						$log_messe_in_onda->salva(FALSE);
+
 					}
-					$fascia_scena_obj = new classe_rel_scene_fascia_oraria($arr[0]["id_rel"]);
-		
+					
 					
 
 					//var_dump($esito);
@@ -359,28 +263,15 @@ if($cambio_scena){
 		
 		if (count($arr)>0){
 			
-			$sql = "UPDATE scene_live set live = 0";
-			$conn->esegui_query($sql);
-			
-			if($arr[0]["id_scene_live"] !== null){
-				$scene_live_obj = new classe_scene_live($arr[0]["id_scene_live"]);
-				
-			}else{
-				$scene_live_obj = new classe_scene_live();
-			}
-			$scene_live_obj->set_rif_rel_fascia_scene( $arr[0]["id_rel"]);
-			$scene_live_obj->set_live(1);
-			$scene_live_obj->set_data_start(date("Y-m-d H:i:s"));
-			$esito = $scene_live_obj->salva(FALSE);
 			$fascia_scena_obj = new classe_rel_scene_fascia_oraria($arr[0]["id_rel"]);
-			
+			$esito = $fascia_scena_obj->aggiorna_scene_live($arr[0]['id_scene_live']);
 			$log_messe_in_onda = new classe_log_messe_in_onda();
 			$log_messe_in_onda->set_evento_id(Null);
 			$log_messe_in_onda->set_scena_id($arr[0]["scena_id"]);
 			$log_messe_in_onda->set_created_at(date("Y-m-d H:i:s"));
 			$log_messe_in_onda->set_updated_at(date("Y-m-d H:i:s"));
 			$log_messe_in_onda->salva(FALSE);
-			
+
 			//var_dump($esito);
 			$scena_obj = new classe_scene($arr[0]["scena_id"]);
 			$url = $scena_obj->genera_url();
