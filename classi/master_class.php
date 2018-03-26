@@ -44,6 +44,7 @@ require_once $prefisso.'classi/classe_fascia_oraria.php';
 require_once $prefisso.'classi/classe_palinsesto.php';
 require_once $prefisso.'classi/classe_rel_scene_fascia_oraria.php';
 require_once $prefisso.'classi/classe_scene_live.php';
+require_once $prefisso.'classi/classe_log_messe_in_onda.php';
 
 
 

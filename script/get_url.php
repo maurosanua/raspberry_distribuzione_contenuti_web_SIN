@@ -116,7 +116,7 @@ if($cambio_scena){
 			//vediamo se li matcha tutti
 			if($cambio_scena){
 				
-				$sql = "SELECT scene_live.id as id_scene_live, rel_scene_fascia_oraria.id as id_rel, scene.*, rel_scene_fascia_oraria.*, scene_live.* FROM fascia_oraria JOIN rel_scene_fascia_oraria on fascia_oraria.id = rel_scene_fascia_oraria.fascia_oraria_id LEFT JOIN scene_live on scene_live.rif_rel_fascia_scene = rel_scene_fascia_oraria.id "
+				$sql = "SELECT scene_live.id as id_scene_live, rel_scene_fascia_oraria.id as id_rel, scene.*, rel_scene_fascia_oraria.*, scene_live.*, scene.id as scena_id FROM fascia_oraria JOIN rel_scene_fascia_oraria on fascia_oraria.id = rel_scene_fascia_oraria.fascia_oraria_id LEFT JOIN scene_live on scene_live.rif_rel_fascia_scene = rel_scene_fascia_oraria.id "
 				. " JOIN scene on rel_scene_fascia_oraria.scena_id = scene.id "
 				. " where palinsesto_id = ? and ora_inizio <= ? and ora_fine >=? and sesso = ? and eta like ? and etnia like ? and ( scene_live.live = 0 or scene_live.live IS NULL)"
 				. " order by scene_live.data_start ASC";
@@ -143,6 +143,11 @@ if($cambio_scena){
 					$esito = $scene_live_obj->salva(FALSE);
 					if($esito){
 						$log_evento_rpi->set_processato(1);
+
+						$log_messe_in_onda = new classe_log_messe_in_onda();
+						$log_messe_in_onda->set_evento_id($log_evento_rpi->get_id());
+						$log_messe_in_onda->set_scena_id($arr[0]["scena_id"]);
+						$log_messe_in_onda->salva(FALSE);
 					}
 					$fascia_scena_obj = new classe_rel_scene_fascia_oraria($arr[0]["id_rel"]);
 					
@@ -163,7 +168,7 @@ if($cambio_scena){
 				
 
 				
-				$sql = "SELECT scene_live.id as id_scene_live,rel_scene_fascia_oraria.id as id_rel, scene.*, rel_scene_fascia_oraria.*, scene_live.* FROM fascia_oraria JOIN rel_scene_fascia_oraria on fascia_oraria.id = rel_scene_fascia_oraria.fascia_oraria_id LEFT JOIN scene_live on scene_live.rif_rel_fascia_scene = rel_scene_fascia_oraria.id"
+				$sql = "SELECT scene_live.id as id_scene_live,rel_scene_fascia_oraria.id as id_rel, scene.*, rel_scene_fascia_oraria.*, scene_live.*, scene.id as scena_id  FROM fascia_oraria JOIN rel_scene_fascia_oraria on fascia_oraria.id = rel_scene_fascia_oraria.fascia_oraria_id LEFT JOIN scene_live on scene_live.rif_rel_fascia_scene = rel_scene_fascia_oraria.id"
 				. " JOIN scene on rel_scene_fascia_oraria.scena_id = scene.id "
 				. " where palinsesto_id = ? and ora_inizio <= ? and ora_fine >=? and sesso = ? and eta like ? and ( scene_live.live = 0 or scene_live.live IS NULL)"
 				. " order by scene_live.data_start ASC";
@@ -189,6 +194,12 @@ if($cambio_scena){
 					$esito = $scene_live_obj->salva(FALSE);
 					if($esito){
 						$log_evento_rpi->set_processato(1);
+
+						
+						$log_messe_in_onda = new classe_log_messe_in_onda();
+						$log_messe_in_onda->set_evento_id($log_evento_rpi->get_id());
+						$log_messe_in_onda->set_scena_id($arr[0]["scena_id"]);
+						$log_messe_in_onda->salva(FALSE);
 					}
 
 					$fascia_scena_obj = new classe_rel_scene_fascia_oraria($arr[0]["id_rel"]);
@@ -276,7 +287,7 @@ if($cambio_scena){
 			if($cambio_scena){
 				//vediamo se almeno ce ne è uno
 			
-				$sql = "SELECT scene_live.id as id_scene_live, rel_scene_fascia_oraria.id as id_rel, scene.*, rel_scene_fascia_oraria.*, scene_live.* FROM fascia_oraria JOIN rel_scene_fascia_oraria on fascia_oraria.id = rel_scene_fascia_oraria.fascia_oraria_id LEFT JOIN scene_live on scene_live.rif_rel_fascia_scene = rel_scene_fascia_oraria.id"
+				$sql = "SELECT scene_live.id as id_scene_live, rel_scene_fascia_oraria.id as id_rel, scene.*, rel_scene_fascia_oraria.*, scene_live.*, scene.id as scena_id  FROM fascia_oraria JOIN rel_scene_fascia_oraria on fascia_oraria.id = rel_scene_fascia_oraria.fascia_oraria_id LEFT JOIN scene_live on scene_live.rif_rel_fascia_scene = rel_scene_fascia_oraria.id"
 				. " JOIN scene on rel_scene_fascia_oraria.scena_id = scene.id "
 				. " where palinsesto_id = ? and ora_inizio <= ? and ora_fine >=? and (sesso = ? or eta like ? or etnia like ?) and ( scene_live.live = 0 or scene_live.live IS NULL)"
 				. " order by scene_live.data_start ASC";
@@ -304,6 +315,12 @@ if($cambio_scena){
 					$esito = $scene_live_obj->salva(FALSE);
 					if($esito){
 						$log_evento_rpi->set_processato(1);
+
+						
+						$log_messe_in_onda = new classe_log_messe_in_onda();
+						$log_messe_in_onda->set_evento_id($log_evento_rpi->get_id());
+						$log_messe_in_onda->set_scena_id($arr[0]["scena_id"]);
+						$log_messe_in_onda->salva(FALSE);
 					}
 					$fascia_scena_obj = new classe_rel_scene_fascia_oraria($arr[0]["id_rel"]);
 		
@@ -330,7 +347,7 @@ if($cambio_scena){
 	if (count($arr)==0 || ($cambio_scena && !$scena_base)){
 		//echo "quiasda";
 		//cerco una scena di default
-		$sql = "SELECT scene_live.id as id_scene_live, rel_scene_fascia_oraria.id as id_rel, scene.*, rel_scene_fascia_oraria.*, scene_live.* FROM fascia_oraria JOIN rel_scene_fascia_oraria on fascia_oraria.id = rel_scene_fascia_oraria.fascia_oraria_id LEFT JOIN scene_live on scene_live.rif_rel_fascia_scene = rel_scene_fascia_oraria.id"
+		$sql = "SELECT scene_live.id as id_scene_live, rel_scene_fascia_oraria.id as id_rel, scene.*, rel_scene_fascia_oraria.*, scene_live.*, scene.id as scena_id  FROM fascia_oraria JOIN rel_scene_fascia_oraria on fascia_oraria.id = rel_scene_fascia_oraria.fascia_oraria_id LEFT JOIN scene_live on scene_live.rif_rel_fascia_scene = rel_scene_fascia_oraria.id"
 				. " JOIN scene on rel_scene_fascia_oraria.scena_id = scene.id "
 				. " where palinsesto_id = ? and ora_inizio <= ? and ora_fine >=? and sesso is null and etnia = '[]' and eta = '[]'"
 				. "order by scene_live.data_start ASC";
@@ -356,8 +373,14 @@ if($cambio_scena){
 			$scene_live_obj->set_data_start(date("Y-m-d H:i:s"));
 			$esito = $scene_live_obj->salva(FALSE);
 			$fascia_scena_obj = new classe_rel_scene_fascia_oraria($arr[0]["id_rel"]);
-
-
+			
+			$log_messe_in_onda = new classe_log_messe_in_onda();
+			$log_messe_in_onda->set_evento_id(Null);
+			$log_messe_in_onda->set_scena_id($arr[0]["scena_id"]);
+			$log_messe_in_onda->set_created_at(date("Y-m-d H:i:s"));
+			$log_messe_in_onda->set_updated_at(date("Y-m-d H:i:s"));
+			$log_messe_in_onda->salva(FALSE);
+			
 			//var_dump($esito);
 			$scena_obj = new classe_scene($arr[0]["scena_id"]);
 			$url = $scena_obj->genera_url();
