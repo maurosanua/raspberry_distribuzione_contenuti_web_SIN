@@ -7,12 +7,14 @@ require_once('classi/classe_AESCipher.php');
 //echo URL_SERVER."registrazione_dispositivo";
 
 
-
+/*
 $cipher = new classe_AESCipher(SERIAL_NUMBER_KEY);
 
 $info = json_encode(['serial_number'=>SERIALE]);
 
 $k = urlencode($cipher->encrypt($info));
+*/
+$k = SERIALE;
 
 ?>
 <html>
