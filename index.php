@@ -10,8 +10,8 @@ $dati_query = array(SERIALE);
 $arr = $conn->query_risultati($sql,$dati_query);
 
 
-$larghezza = 1366;
-$altezza = 768;
+$larghezza = 1920;
+$altezza = 1080;
 
 if(count($arr)>0){
 	
