@@ -13,6 +13,9 @@ $arr = $conn->query_risultati($sql,$dati_query);
 $larghezza = 1920;
 $altezza = 1080;
 
+$x_offset = 0;
+$y_offset = 0;
+
 if(count($arr)>0){
 	
 	if(strlen($arr[0]["iframe_w"])>0){
@@ -22,6 +25,14 @@ if(count($arr)>0){
 	if(strlen($arr[0]["iframe_h"])>0){
 		$altezza = $arr[0]["iframe_h"];
 	}
+
+	if(strlen($arr[0]["iframe_x"])>0){
+		$x_offset = $arr[0]["iframe_x"];
+	}
+
+	if(strlen($arr[0]["iframe_y"])>0){
+		$y_offset = $arr[0]["iframe_y"];
+	}
 	
 }
 ?><html>
@@ -29,7 +40,7 @@ if(count($arr)>0){
 		<title>Rasp-url</title>
 	</head>
 	<body style="margin: 0px;overflow: hidden;">
-		<iframe id="iframe1" src="blanck.php" data-id="" style="width:<?=$larghezza?>px;height:<?=$altezza?>px;overflow:hidden;overflow-y: scroll;" frameBorder="0"></iframe> 
+		<iframe id="iframe1" src="blanck.php" data-id="" style="width:<?=$larghezza?>px;height:<?=$altezza?>px;overflow:hidden;overflow-y: scroll; position: absolute; top:<?=$y_offset?>px;left:<?=$x_offset?>px" frameBorder="0"></iframe> 
 
 
 
