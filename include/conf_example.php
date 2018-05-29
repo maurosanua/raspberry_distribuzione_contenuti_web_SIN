@@ -30,4 +30,8 @@ define("AD_DOMAIN", "sinergo");
 
 define("URL_RASPBERRY","http://raspberry_url.it");
 define("URL_SERVER","http://palinsesto.it");
+
+/*  PARAMETRI SISTEMA OPERATIVO IN USO
+-------------------------------------------------------------------------------------------------------------------------------- */
+define("SISTEMA", "linux");
 ?>

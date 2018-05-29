@@ -36,7 +36,11 @@ function win_serial_number(){
 }
 
 //definiamo qui la costante SERIALE in modo che venga popolata usando la funzione appena definita
-define ("SERIALE", win_serial_number());
+if (SISTEMA == "linux") {
+	define ("SERIALE", rpi_serial_number());
+} else if (SISTEMA == "windows") {
+	define ("SERIALE", win_serial_number());
+}
 
 
 
