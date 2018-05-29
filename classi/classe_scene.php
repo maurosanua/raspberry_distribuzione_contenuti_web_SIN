@@ -346,7 +346,10 @@ class classe_scene extends base_scene {
 				//video
 				$url = URL_RASPBERRY."/video.php?scena_id=".$this->get_id();
 				break;
-			
+			case 6:
+				$filename =$this->get_contenuti();
+				$url = URL_RASPBERRY."/contents/siti/".substr($filename,0,count($filename)-5)."/";
+				break;
 			default :
 				$url = "blanck.php";
 		}
