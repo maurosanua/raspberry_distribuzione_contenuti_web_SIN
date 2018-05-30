@@ -342,6 +342,23 @@ class classe_rel_scene_fascia_oraria extends base_rel_scene_fascia_oraria {
 		return $esito;
 	}
 
+	public function genera_output_geturl(){
+		$scena_obj = new classe_scene($this->get_scena_id());
+		$url = $scena_obj->genera_url();
+		$code = $scena_obj->get_id();
+		$durata =  $this->get_durata_ms();
+		$arr_return = array("url"=>$url,"durata"=>$durata, "code"=>$code, "status"=>"OK");
+
+		return json_encode($arr_return);
+	}
+
+	public function is_forzata(){
+		if($this->get_sesso(0)==null&&$this->get_eta(0)=="[]"&&$this->get_etnia(0)=="[]"){
+			return false;
+		}
+		return true;
+	}
+
 }
 
 

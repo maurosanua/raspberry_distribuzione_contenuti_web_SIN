@@ -5,21 +5,16 @@ init_sessione();
 
 $conn = new DB_PDO();
 
-
 $sql = "SELECT * FROM dispositivi where numero_serie = ?";
 $dati_query = array(SERIALE);
 $arr = $conn->query_risultati($sql,$dati_query);
 
 if (count($arr)==0){
 	//mando alla registrazione
-	
 	$arr_return = array("url"=>URL_RASPBERRY."/registrazione.php","durata"=>"10", "code"=>"-1", "status"=>"OK");
-
 	echo json_encode($arr_return);
-
 	die();
 }
-
 
 $cambio_scena = true;
 $scena_base = false;
@@ -27,8 +22,54 @@ $url = "";
 $durata = "";
 $code = 0;
 
-
 $palinsesto_id = $arr[0]["palinsesto_id"]; 
+
+$scena_live = null;
+$rel_fascia_scene = null;
+//recupero la scena corrente
+
+$arr_scena_live = $conn->query_risultati(
+		"SELECT id from scene_live where live = 1"
+	);
+try{
+	$scena_live = new classe_scene_live($arr_scena_live[0]["id"]);
+}catch(Throwable $e){
+	
+	//capire come gestirla
+}
+
+if(isset($scena_live)){
+	$arr_scena_fascia_oraria = $conn->query_risultati(
+		"SELECT id from rel_scene_fascia_oraria where id = :id_rel_scena",
+		array("id_rel_scena"=>$scena_live->get_rif_rel_fascia_scene())
+	);
+
+	try{
+	$rel_fascia_scene = new classe_rel_scene_fascia_oraria($arr_scena_fascia_oraria[0]["id"]);
+	}catch(Throwable $e){
+	
+	//capire come gestirla
+	}
+}
+
+//controlliamo se la scena in corso è forzata
+if(isset($rel_fascia_scene)){
+	if($rel_fascia_scene->is_forzata()){
+		//controlliamo che non sia finito il suo tempo di esecuzione
+		$inizio_scena = new DateTime($scena_live->get_data_start(0));
+		$adesso = new DateTime();
+		$diff = $adesso->diff($inizio_scena);
+		if($diff->s<$rel_fascia_scene->get_durata_ms(0)/1000){
+			echo $rel_fascia_scene->genera_output_geturl();
+			$conn->Close();
+			die();
+		}
+	}
+}
+
+//controlliamo se ci sono persone davanti allo schermo
+
+
 
 
 //per prima cosa vediamo se c'è qualcosa in corso, se non c'è nulla poi passiamo a capire cosa trasmettere.
@@ -271,9 +312,9 @@ if($cambio_scena){
 	
 }
 
-$arr_return = array("url"=>$url,"durata"=>$durata, "code"=>$code, "status"=>"OK");
 
-echo json_encode($arr_return);
+
+echo $fascia_scena_obj->genera_output_geturl();
 
 
 $conn->Close();
