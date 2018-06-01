@@ -33,13 +33,5 @@ if(count($arr)>0){
 }
 
 $conn->Close();
+header("location: http://www.youtube.com/embed/".$contenuto."?modestbranding=1&autoplay=1&controls=0&fs=0&loop=1&rel=0&showinfo=0&disablekb=1&playlist=IsBInsOj8TY");
 ?>
-<html>
-	<head>
-		
-	</head>
-	<body style="margin: 0px;">
-		<iframe class="videoContainer__video" width="<?=$larghezza?>px" height="<?=$altezza?>px" src="http://www.youtube.com/embed/<?=$contenuto?>?modestbranding=1&autoplay=1&controls=0&fs=0&loop=1&rel=0&showinfo=0&disablekb=1&playlist=IsBInsOj8TY" frameborder="0"></iframe>
-
-	</body>
-</html>

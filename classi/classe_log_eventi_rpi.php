@@ -350,6 +350,7 @@ class base_log_eventi_rpi {
 	private $appearance_datetime = null;
 	private $created_at = null;
 	private $updated_at = null;
+	private $disappearance_datetime = null;
 
 	private $errore = false;
 	protected $attr = array();
@@ -388,6 +389,7 @@ class base_log_eventi_rpi {
 		$this->attr[] = $this->appearance_datetime = new attributo("appearance_datetime", "data_time");
 		$this->attr[] = $this->created_at = new attributo("created_at");
 		$this->attr[] = $this->updated_at = new attributo("updated_at");
+		$this->attr[] = $this->disappearance_datetime = new attributo("disappearance_datetime", "data_time");
 
 		if($id > 0){
 
@@ -410,6 +412,7 @@ class base_log_eventi_rpi {
 				$this->appearance_datetime->set_valore($arr[0]["appearance_datetime"]);
 				$this->created_at->set_valore($arr[0]["created_at"]);
 				$this->updated_at->set_valore($arr[0]["updated_at"]);
+				$this->disappearance_datetime->set_valore($arr[0]["disappearance_datetime"]);
 		
 				$this->old_data["id"] = $this->id;
 				foreach($this->attr as $attr){
@@ -591,7 +594,7 @@ class base_log_eventi_rpi {
 			//andiamo a inserire le informazioni nel db
 			if($this->id == 0){
 
-				$sql = "INSERT INTO log_eventi_rpi (data_evento, genere, eta, etnia, processato, camera_id, appearance_datetime, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+				$sql = "INSERT INTO log_eventi_rpi (data_evento, genere, eta, etnia, processato, camera_id, appearance_datetime, created_at, updated_at, disappearance_datetime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 				$dati_query = array(
 								$this->data_evento->get_valore(99), 
@@ -602,7 +605,8 @@ class base_log_eventi_rpi {
 								$this->camera_id->get_valore(99), 
 								$this->appearance_datetime->get_valore(99), 
 								$this->created_at->get_valore(99), 
-								$this->updated_at->get_valore(99)
+								$this->updated_at->get_valore(99), 
+								$this->disappearance_datetime->get_valore(99)
 							);
 
 				
@@ -633,7 +637,7 @@ class base_log_eventi_rpi {
 
 			}else{//aggiorniamo l'oggetto
 
-				$sql = "UPDATE log_eventi_rpi SET data_evento = ?, genere = ?, eta = ?, etnia = ?, processato = ?, camera_id = ?, appearance_datetime = ?, created_at = ?, updated_at = ?"
+				$sql = "UPDATE log_eventi_rpi SET data_evento = ?, genere = ?, eta = ?, etnia = ?, processato = ?, camera_id = ?, appearance_datetime = ?, created_at = ?, updated_at = ?, disappearance_datetime = ?"
 						." WHERE id = ?";
 
 				$dati_query = array(
@@ -646,6 +650,7 @@ class base_log_eventi_rpi {
 								$this->appearance_datetime->get_valore(99), 
 								$this->created_at->get_valore(99), 
 								$this->updated_at->get_valore(99), 
+								$this->disappearance_datetime->get_valore(99), 
 								$this->id
 							);
 
@@ -782,6 +787,16 @@ class base_log_eventi_rpi {
 		return $this->updated_at->is_corretto();
 	}
 	
+	/**
+	 * 
+	 * @param string $disappearance_datetime
+	 * @return boolean true se il valore e' corretto, false altrimenti
+	 */
+	public function set_disappearance_datetime($disappearance_datetime) {
+		$this->disappearance_datetime->set_valore($disappearance_datetime);
+		return $this->disappearance_datetime->is_corretto();
+	}
+	
 
 	/******************************
 	 * getter
@@ -829,6 +844,10 @@ class base_log_eventi_rpi {
 	
 	public function get_updated_at($formattazione_dato = 1) {
 		return $this->updated_at->get_valore($formattazione_dato);
+	}
+	
+	public function get_disappearance_datetime($formattazione_dato = 1) {
+		return $this->disappearance_datetime->get_valore($formattazione_dato);
 	}
 
 

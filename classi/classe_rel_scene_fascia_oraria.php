@@ -347,7 +347,7 @@ class classe_rel_scene_fascia_oraria extends base_rel_scene_fascia_oraria {
 		$url = $scena_obj->genera_url();
 		$code = $scena_obj->get_id();
 		$durata =  $this->get_durata_ms();
-		$arr_return = array("url"=>$url,"durata"=>$durata, "code"=>$code, "status"=>"OK");
+		$arr_return = array("url"=>$url, "durata"=>$durata, "code"=>$code, "status"=>"OK");
 
 		return json_encode($arr_return);
 	}

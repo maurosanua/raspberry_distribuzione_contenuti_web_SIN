@@ -40,7 +40,7 @@ if(count($arr)>0){
 		<title>Rasp-url</title>
 	</head>
 	<body style="margin: 0px;overflow: hidden;">
-		<iframe id="iframe1" src="blanck.php" data-id="" style="width:<?=$larghezza?>px;height:<?=$altezza?>px;overflow:hidden;overflow-y: scroll; position: absolute; top:<?=$y_offset?>px;left:<?=$x_offset?>px" frameBorder="0"></iframe> 
+		<iframe id="iframe1" src="blanck.php" data-id="" style="width:<?=$larghezza?>px;height:<?=$altezza?>px;overflow:hidden;overflow-y: scroll; position: absolute; top:<?=$y_offset?>px;left:<?=$x_offset?>px" frameBorder="0" ></iframe> 
 
 
 
@@ -62,8 +62,8 @@ if(count($arr)>0){
  
 $(document).ready(function() {
 	var altezza = $( window ).height()+"px";
-	//$("#iframe1").css("height",altezza);
-
+	
+	
 });
  
 var url_code = 0;

@@ -23,32 +23,47 @@ $durata = "";
 $code = 0;
 
 $palinsesto_id = $arr[0]["palinsesto_id"]; 
-
+//########################### NUOVA VERSIONE #########################################################
 $scena_live = null;
 $rel_fascia_scene = null;
-//recupero la scena corrente
 
+//recupero la fascia oraria corrente
+$fascia_oraria = $conn->query_risultati(
+	"SELECT * FROM fascia_oraria WHERE palinsesto_id = ? AND ora_inizio <= ? AND (ora_fine >= ? OR ora_fine = '00:00:00')",
+	array($palinsesto_id, date("H:i:00"), date("H:i:00"))
+);
+
+//recupero tutte le relazioni scena-fascia_oraria
+if(count($fascia_oraria) == 0){
+	// da capire cosa fare
+}
+
+$arr_scena_fascia_oraria = $conn->query_risultati(
+	"SELECT rel_scene_fascia_oraria.*, scene_live.data_start, scene_live.live
+ 	 FROM rel_scene_fascia_oraria LEFT JOIN scene_live ON scene_live.rif_rel_fascia_scene = rel_scene_fascia_oraria.id
+	 WHERE fascia_oraria_id = ?",
+	array($fascia_oraria[0]["id"])
+);
+
+//recupero la scena corrente
 $arr_scena_live = $conn->query_risultati(
 		"SELECT id from scene_live where live = 1"
 	);
-try{
-	$scena_live = new classe_scene_live($arr_scena_live[0]["id"]);
-}catch(Throwable $e){
-	
-	//capire come gestirla
+
+if(count($arr_scena_live)>0){
+	try{
+		$scena_live = new classe_scene_live($arr_scena_live[0]["id"]);
+	} catch(Throwable $e){
+		
+		//capire come gestirla
+	}
 }
 
 if(isset($scena_live)){
-	$arr_scena_fascia_oraria = $conn->query_risultati(
-		"SELECT id from rel_scene_fascia_oraria where id = :id_rel_scena",
-		array("id_rel_scena"=>$scena_live->get_rif_rel_fascia_scene())
-	);
-
-	try{
-	$rel_fascia_scene = new classe_rel_scene_fascia_oraria($arr_scena_fascia_oraria[0]["id"]);
-	}catch(Throwable $e){
-	
-	//capire come gestirla
+	foreach($arr_scena_fascia_oraria as $scena_fascia_oraria){
+		if($scena_fascia_oraria["id"] == $scena_live->get_rif_rel_fascia_scene()){
+			$rel_fascia_scene = new classe_rel_scene_fascia_oraria($scena_fascia_oraria["id"]);
+		}
 	}
 }
 
@@ -67,7 +82,13 @@ if(isset($rel_fascia_scene)){
 	}
 }
 
-//controlliamo se ci sono persone davanti allo schermo
+//recupero tutte le persone davanti allo schermo
+$arr_eventi = $conn->query_risultati(
+	"SELECT * FROM log_eventi_rpi WHERE disappearance_datetime IS NULL"
+);
+
+//##################################################################################################
+
 
 
 
