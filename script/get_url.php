@@ -23,7 +23,7 @@ $durata = "";
 $code = 0;
 
 $palinsesto_id = $arr[0]["palinsesto_id"]; 
-//########################### NUOVA VERSIONE #########################################################
+
 $scena_live = null;
 $rel_fascia_scene = null;
 
@@ -67,13 +67,12 @@ $arr_eventi = $conn->query_risultati(
 	"SELECT * FROM log_eventi_rpi WHERE disappearance_datetime IS NULL"
 );
 
-
+$adesso = new DateTime();
 //controlliamo se la scena in corso è forzata
 if(isset($rel_fascia_scene)){
 	if($rel_fascia_scene->is_forzata()||count($arr_eventi)==0){
 		//controlliamo che non sia finito il suo tempo di esecuzione
 		$inizio_scena = new DateTime($scena_live->get_data_start(0));
-		$adesso = new DateTime();
 		$diff = $adesso->diff($inizio_scena);
 		if($diff->s<$rel_fascia_scene->get_durata_ms(0)/1000){
 			echo $rel_fascia_scene->genera_output_geturl();
@@ -92,6 +91,12 @@ foreach($arr_scena_fascia_oraria as $scena_fascia_oraria){
 	$array_punteggi[$scena_fascia_oraria["id"]] = $rel_obj->calcola_punteggio_di_matching($arr_eventi);
 }
 
+file_put_contents('../../request_data/punteggi.txt', "\r\n-----------------------------------------------", FILE_APPEND);
+file_put_contents('../../request_data/punteggi.txt', "\r\nPUNTEGGI:\r\n", FILE_APPEND);
+file_put_contents('../../request_data/punteggi.txt', json_encode($array_punteggi, JSON_PRETTY_PRINT), FILE_APPEND);
+file_put_contents('../../request_data/punteggi.txt', "\r\PERSONE:\r\n", FILE_APPEND);
+file_put_contents('../../request_data/punteggi.txt', json_encode($arr_eventi, JSON_PRETTY_PRINT), FILE_APPEND);
+
 /*echo json_encode($array_punteggi,JSON_PRETTY_PRINT);
 die();*/
 
@@ -100,7 +105,21 @@ $scena_da_vedere = new classe_rel_scene_fascia_oraria($id_scena_da_vedere);
 
 $scena_da_vedere->aggiorna_scene_live();
 
+$arr_log_scena = $conn->query_risultati(
+	"SELECT id FROM log_scene WHERE data_end IS NULL"
+);
 
+if(count($arr_log_scena) > 0){
+	$log_scena_obj = new classe_log_scene($arr_log_scena[0]["id"]);
+	$log_scena_obj->set_data_end($adesso);
+	$log_scena_obj->salva(false);
+}
+
+$log_scena_obj = new classe_log_scene();
+$log_scena_obj->set_id_rel_fascia_scene($scena_da_vedere->get_id());
+$log_scena_obj->set_id_scena($scena_da_vedere->get_scena_id());
+$log_scena_obj->set_data_start($adesso);
+$log_scena_obj->salva(false);
 
 echo $scena_da_vedere->genera_output_geturl();
 
