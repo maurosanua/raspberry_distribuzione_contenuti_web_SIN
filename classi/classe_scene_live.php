@@ -317,7 +317,20 @@ class classe_scene_live extends base_scene_live {
 	/****************
 	 * metodi ad hoc
 	 */
-	 
+	
+	 public function from_rel_fascia_scene($id){
+		 
+		 $id_scena = $this->connessione()->query_risultati(
+			"select id from scene_live where rif_rel_fascia_scene = ?",
+			[$id]
+		 );
+		 if(count($id_scena)>0){
+			 return new classe_scene_live($id_scena[0]["id"]);
+		 }else{
+			 return new classe_scene_live();
+		 }
+	 }
+
 
 	public function salva($make_log = true){
 		$this->set_updated_at(date("Y-m-d H:i:s"));

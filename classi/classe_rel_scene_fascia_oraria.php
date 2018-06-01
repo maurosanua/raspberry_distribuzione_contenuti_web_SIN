@@ -16,7 +16,7 @@ class classe_rel_scene_fascia_oraria extends base_rel_scene_fascia_oraria {
 	private $pag_totali = 1;
 
 	//----------------------------------- */
-
+	public $data_start = null;
 
 	public function __construct($id = 0) {
 		parent::__construct($id);
@@ -317,21 +317,63 @@ class classe_rel_scene_fascia_oraria extends base_rel_scene_fascia_oraria {
 	/****************
 	 * metodi ad hoc
 	 */
-	public function aggiorna_scene_live($id_scene_live){
+	
+	public function calcola_punteggio_di_matching($arr_eventi){
+		$numero_match_categorie = 0;
+		$numero_match_persone = 0;
+		$tempo_passato_dalla_visione = 0;
+		$generica = 0;
+		
+		$peso_categorie = 10;
+		$peso_persone = 1;
+		$peso_data = 1.0/86500.0;
+		if(is_null($this->get_sesso(0)) && $this->get_eta(0) == "[]" && $this->get_etnia(0) == "[]"){
+			$generica = 1;
+		}
+
+		foreach($arr_eventi as $evento){
+			if($this->get_sesso(0) == $evento["genere"]){
+				$numero_match_categorie++;
+			}
+			if(strpos($this->get_eta(0), $evento["eta"]) !== false){
+				$numero_match_categorie++;
+			}
+			if(strpos($this->get_etnia(0), $evento["etnia"]) !== false){
+				$numero_match_categorie++;
+			}
+			if((is_null($this->get_sesso(0)) || $this->get_sesso(0) == $evento["genere"]) && 
+				($this->get_eta(0) == "[]" || strpos($this->get_eta(0), $evento["eta"]) !== false) && 
+				($this->get_etnia(0) == "[]" || strpos($this->get_etnia(0), $evento["etnia"]) !== false)){
+				$numero_match_persone++;
+			}
+		}
+
+		$inizio_scena = is_null($this->data_start) ? null : new DateTime($this->data_start);
+		$adesso = new DateTime();
+		if(is_null($inizio_scena) || ($adesso->diff($inizio_scena))->s > 86400){
+			$tempo_passato_dalla_visione = 86400;
+		} else {
+			$tempo_passato_dalla_visione = ($adesso->diff($inizio_scena))->s;
+			
+		}
+
+		return $generica + ($peso_categorie * $numero_match_categorie) + ($peso_persone * $numero_match_persone) + ($peso_data * $tempo_passato_dalla_visione);
+		return array(
+			"generica"=>$generica,
+			"numero_match_categorie"=>$numero_match_categorie,
+			"numero_match_persone"=>$numero_match_persone,
+			"tempo_passato_dalla_visione"=>$peso_data*$tempo_passato_dalla_visione,
+			"totale"=>$generica + ($peso_categorie * $numero_match_categorie) + ($peso_persone * $numero_match_persone) + ($peso_data * $tempo_passato_dalla_visione)
+		);
+
+	}
 
 
+	public function aggiorna_scene_live(){
 		$this->connessione()->begin_transaction();
 		$sql = "UPDATE scene_live set live = 0";
 		$this->connessione()->esegui_query($sql);
-		if($id_scene_live !== null){
-			try{
-				$scene_live_obj = new classe_scene_live($id_scene_live);
-			}catch(Exception $e){
-				$scene_live_obj = new classe_scene_live();
-			}	
-		}else{
-			$scene_live_obj = new classe_scene_live();
-		}
+		$scene_live_obj = (new classe_scene_live())->from_rel_fascia_scene($this->id);
 		$scene_live_obj->set_rif_rel_fascia_scene( $this->get_id());
 		$scene_live_obj->set_live(1);
 		$scene_live_obj->set_data_start(date("Y-m-d H:i:s"));
