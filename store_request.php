@@ -21,6 +21,16 @@ $arr_persone = json_decode($data,true);
 
 $sql = "SELECT id from log_eventi_rpi where disappearance_datetime is null";
 $arr_res = $conn->query_risultati($sql);
+
+$arr_dispositivo = $conn->query_risultati(
+    "SELECT * FROM dispositivi"
+    );
+
+$id_dispositivo = null;
+if(count($arr_dispositivo)>0){
+    $id_dispositivo = $arr_dispositivo[0]["id"];
+}
+
 $arr_log = array();
 foreach($arr_res as $id){
     $arr_log[] = new classe_log_eventi_rpi($id[0]);
@@ -44,6 +54,7 @@ if(isset($arr_persone["Audience"]) && is_array($arr_persone["Audience"])){
             $nuovo_evento->set_etnia($persona["Race"]);
             $nuovo_evento->set_disappearance_datetime(null);
             $nuovo_evento->set_processato(0);
+            $nuovo_evento->set_dispositivo_id($id_dispositivo);
             $nuovo_evento->set_camera_id($persona["ID"]);
             $nuovo_evento->set_appearance_datetime(substr($persona["AppearanceDateTime"],0,10)." ".substr($persona["AppearanceDateTime"],11));
             $nuovo_evento->salva(false);
