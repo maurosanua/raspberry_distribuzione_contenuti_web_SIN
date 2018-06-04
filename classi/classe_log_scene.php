@@ -342,8 +342,9 @@ class base_log_scene {
 	
 	protected $exist = false;
 
-	private $id_rel_fascia_scene = null;
-	private $id_scena = null;
+	private $rel_fascia_scene_id = null;
+	private $scena_id = null;
+	private $dispositivo_id = null;
 	private $data_start = null;
 	private $data_end = null;
 	private $created_at = null;
@@ -377,8 +378,9 @@ class base_log_scene {
 		$this->id = $id;
 
 
-		$this->attr[] = $this->id_rel_fascia_scene = new attributo("id_rel_fascia_scene", "int");
-		$this->attr[] = $this->id_scena = new attributo("id_scena", "int");
+		$this->attr[] = $this->rel_fascia_scene_id = new attributo("rel_fascia_scene_id", "int");
+		$this->attr[] = $this->scena_id = new attributo("scena_id", "int");
+		$this->attr[] = $this->dispositivo_id = new attributo("dispositivo_id", "int");
 		$this->attr[] = $this->data_start = new attributo("data_start", "data_time");
 		$this->attr[] = $this->data_end = new attributo("data_end", "data_time");
 		$this->attr[] = $this->created_at = new attributo("created_at");
@@ -396,8 +398,9 @@ class base_log_scene {
 
 				$this->exist = true;
 
-				$this->id_rel_fascia_scene->set_valore($arr[0]["id_rel_fascia_scene"]);
-				$this->id_scena->set_valore($arr[0]["id_scena"]);
+				$this->rel_fascia_scene_id->set_valore($arr[0]["rel_fascia_scene_id"]);
+				$this->scena_id->set_valore($arr[0]["scena_id"]);
+				$this->dispositivo_id->set_valore($arr[0]["dispositivo_id"]);
 				$this->data_start->set_valore($arr[0]["data_start"]);
 				$this->data_end->set_valore($arr[0]["data_end"]);
 				$this->created_at->set_valore($arr[0]["created_at"]);
@@ -583,11 +586,12 @@ class base_log_scene {
 			//andiamo a inserire le informazioni nel db
 			if($this->id == 0){
 
-				$sql = "INSERT INTO log_scene (id_rel_fascia_scene, id_scena, data_start, data_end, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)";
+				$sql = "INSERT INTO log_scene (rel_fascia_scene_id, scena_id, dispositivo_id, data_start, data_end, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
 				$dati_query = array(
-								$this->id_rel_fascia_scene->get_valore(99), 
-								$this->id_scena->get_valore(99), 
+								$this->rel_fascia_scene_id->get_valore(99), 
+								$this->scena_id->get_valore(99), 
+								$this->dispositivo_id->get_valore(99), 
 								$this->data_start->get_valore(99), 
 								$this->data_end->get_valore(99), 
 								$this->created_at->get_valore(99), 
@@ -622,12 +626,13 @@ class base_log_scene {
 
 			}else{//aggiorniamo l'oggetto
 
-				$sql = "UPDATE log_scene SET id_rel_fascia_scene = ?, id_scena = ?, data_start = ?, data_end = ?, created_at = ?, updated_at = ?"
+				$sql = "UPDATE log_scene SET rel_fascia_scene_id = ?, scena_id = ?, dispositivo_id = ?, data_start = ?, data_end = ?, created_at = ?, updated_at = ?"
 						." WHERE id = ?";
 
 				$dati_query = array(
-								$this->id_rel_fascia_scene->get_valore(99), 
-								$this->id_scena->get_valore(99), 
+								$this->rel_fascia_scene_id->get_valore(99), 
+								$this->scena_id->get_valore(99), 
+								$this->dispositivo_id->get_valore(99), 
 								$this->data_start->get_valore(99), 
 								$this->data_end->get_valore(99), 
 								$this->created_at->get_valore(99), 
@@ -680,22 +685,32 @@ class base_log_scene {
 	
 	/**
 	 * 
-	 * @param string $id_rel_fascia_scene
+	 * @param string $rel_fascia_scene_id
 	 * @return boolean true se il valore e' corretto, false altrimenti
 	 */
-	public function set_id_rel_fascia_scene($id_rel_fascia_scene) {
-		$this->id_rel_fascia_scene->set_valore($id_rel_fascia_scene);
-		return $this->id_rel_fascia_scene->is_corretto();
+	public function set_rel_fascia_scene_id($rel_fascia_scene_id) {
+		$this->rel_fascia_scene_id->set_valore($rel_fascia_scene_id);
+		return $this->rel_fascia_scene_id->is_corretto();
 	}
 	
 	/**
 	 * 
-	 * @param string $id_scena
+	 * @param string $scena_id
 	 * @return boolean true se il valore e' corretto, false altrimenti
 	 */
-	public function set_id_scena($id_scena) {
-		$this->id_scena->set_valore($id_scena);
-		return $this->id_scena->is_corretto();
+	public function set_scena_id($scena_id) {
+		$this->scena_id->set_valore($scena_id);
+		return $this->scena_id->is_corretto();
+	}
+	
+	/**
+	 * 
+	 * @param string $dispositivo_id
+	 * @return boolean true se il valore e' corretto, false altrimenti
+	 */
+	public function set_dispositivo_id($dispositivo_id) {
+		$this->dispositivo_id->set_valore($dispositivo_id);
+		return $this->dispositivo_id->is_corretto();
 	}
 	
 	/**
@@ -751,12 +766,16 @@ class base_log_scene {
 		return $this->id;
 	}
 	
-	public function get_id_rel_fascia_scene($formattazione_dato = 1) {
-		return $this->id_rel_fascia_scene->get_valore($formattazione_dato);
+	public function get_rel_fascia_scene_id($formattazione_dato = 1) {
+		return $this->rel_fascia_scene_id->get_valore($formattazione_dato);
 	}
 	
-	public function get_id_scena($formattazione_dato = 1) {
-		return $this->id_scena->get_valore($formattazione_dato);
+	public function get_scena_id($formattazione_dato = 1) {
+		return $this->scena_id->get_valore($formattazione_dato);
+	}
+	
+	public function get_dispositivo_id($formattazione_dato = 1) {
+		return $this->dispositivo_id->get_valore($formattazione_dato);
 	}
 	
 	public function get_data_start($formattazione_dato = 1) {
