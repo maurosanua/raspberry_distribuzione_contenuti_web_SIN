@@ -319,10 +319,6 @@ class classe_log_scene extends base_log_scene {
 	 */
 	
 	public function salva($make_log = true){
-		$this->set_updated_at(date("Y-m-d H:i:s"));
-		if($this->get_id()==0){
-			$this->set_created_at(date("Y-m-d H:i:s"));
-		}
 		return parent::salva($make_log);
 	}
 
@@ -347,8 +343,7 @@ class base_log_scene {
 	private $dispositivo_id = null;
 	private $data_start = null;
 	private $data_end = null;
-	private $created_at = null;
-	private $updated_at = null;
+	private $processato = null;
 
 	private $errore = false;
 	protected $attr = array();
@@ -383,8 +378,7 @@ class base_log_scene {
 		$this->attr[] = $this->dispositivo_id = new attributo("dispositivo_id", "int");
 		$this->attr[] = $this->data_start = new attributo("data_start", "data_time");
 		$this->attr[] = $this->data_end = new attributo("data_end", "data_time");
-		$this->attr[] = $this->created_at = new attributo("created_at");
-		$this->attr[] = $this->updated_at = new attributo("updated_at");
+		$this->attr[] = $this->processato = new attributo("processato", "bool_int");
 
 		if($id > 0){
 
@@ -403,8 +397,7 @@ class base_log_scene {
 				$this->dispositivo_id->set_valore($arr[0]["dispositivo_id"]);
 				$this->data_start->set_valore($arr[0]["data_start"]);
 				$this->data_end->set_valore($arr[0]["data_end"]);
-				$this->created_at->set_valore($arr[0]["created_at"]);
-				$this->updated_at->set_valore($arr[0]["updated_at"]);
+				$this->processato->set_valore($arr[0]["processato"]);
 		
 				$this->old_data["id"] = $this->id;
 				foreach($this->attr as $attr){
@@ -586,7 +579,7 @@ class base_log_scene {
 			//andiamo a inserire le informazioni nel db
 			if($this->id == 0){
 
-				$sql = "INSERT INTO log_scene (rel_fascia_scene_id, scena_id, dispositivo_id, data_start, data_end, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)";
+				$sql = "INSERT INTO log_scene (rel_fascia_scene_id, scena_id, dispositivo_id, data_start, data_end, processato) VALUES (?, ?, ?, ?, ?, ?)";
 
 				$dati_query = array(
 								$this->rel_fascia_scene_id->get_valore(99), 
@@ -594,8 +587,7 @@ class base_log_scene {
 								$this->dispositivo_id->get_valore(99), 
 								$this->data_start->get_valore(99), 
 								$this->data_end->get_valore(99), 
-								$this->created_at->get_valore(99), 
-								$this->updated_at->get_valore(99)
+								$this->processato->get_valore(99)
 							);
 
 				
@@ -626,7 +618,7 @@ class base_log_scene {
 
 			}else{//aggiorniamo l'oggetto
 
-				$sql = "UPDATE log_scene SET rel_fascia_scene_id = ?, scena_id = ?, dispositivo_id = ?, data_start = ?, data_end = ?, created_at = ?, updated_at = ?"
+				$sql = "UPDATE log_scene SET rel_fascia_scene_id = ?, scena_id = ?, dispositivo_id = ?, data_start = ?, data_end = ?, processato = ?"
 						." WHERE id = ?";
 
 				$dati_query = array(
@@ -635,8 +627,7 @@ class base_log_scene {
 								$this->dispositivo_id->get_valore(99), 
 								$this->data_start->get_valore(99), 
 								$this->data_end->get_valore(99), 
-								$this->created_at->get_valore(99), 
-								$this->updated_at->get_valore(99), 
+								$this->processato->get_valore(99), 
 								$this->id
 							);
 
@@ -735,22 +726,12 @@ class base_log_scene {
 	
 	/**
 	 * 
-	 * @param string $created_at
+	 * @param string $processato
 	 * @return boolean true se il valore e' corretto, false altrimenti
 	 */
-	public function set_created_at($created_at) {
-		$this->created_at->set_valore($created_at);
-		return $this->created_at->is_corretto();
-	}
-	
-	/**
-	 * 
-	 * @param string $updated_at
-	 * @return boolean true se il valore e' corretto, false altrimenti
-	 */
-	public function set_updated_at($updated_at) {
-		$this->updated_at->set_valore($updated_at);
-		return $this->updated_at->is_corretto();
+	public function set_processato($processato) {
+		$this->processato->set_valore($processato);
+		return $this->processato->is_corretto();
 	}
 	
 
@@ -786,12 +767,8 @@ class base_log_scene {
 		return $this->data_end->get_valore($formattazione_dato);
 	}
 	
-	public function get_created_at($formattazione_dato = 1) {
-		return $this->created_at->get_valore($formattazione_dato);
-	}
-	
-	public function get_updated_at($formattazione_dato = 1) {
-		return $this->updated_at->get_valore($formattazione_dato);
+	public function get_processato($formattazione_dato = 1) {
+		return $this->processato->get_valore($formattazione_dato);
 	}
 
 
@@ -834,5 +811,6 @@ class base_log_scene {
 	}
 		
 }
+
 
 ?>
