@@ -27,12 +27,14 @@ function rpi_serial_number(){
 
 function win_serial_number(){
 	
-	$comando = "wmic baseboard get serialnumber";
+    
+	$comando = "wmic DISKDRIVE where 'Index=0' get model,serialnumber";
 	// $comando = "cat /proc/cpuinfo |grep Serial|cut -d' ' -f2";
 
 	$out = trim(shell_exec($comando));
 	$out = explode("\r\n",$out)[1];
-	return $out;
+	$out=trim($out);
+	return sha1($out);
 }
 
 //definiamo qui la costante SERIALE in modo che venga popolata usando la funzione appena definita
