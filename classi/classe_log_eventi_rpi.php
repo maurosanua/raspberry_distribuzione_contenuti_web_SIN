@@ -345,12 +345,13 @@ class base_log_eventi_rpi {
 	private $genere = null;
 	private $eta = null;
 	private $etnia = null;
+	private $dispositivo_id = null;
 	private $processato = null;
 	private $camera_id = null;
 	private $appearance_datetime = null;
+	private $disappearance_datetime = null;
 	private $created_at = null;
 	private $updated_at = null;
-	private $disappearance_datetime = null;
 
 	private $errore = false;
 	protected $attr = array();
@@ -384,12 +385,13 @@ class base_log_eventi_rpi {
 		$this->attr[] = $this->genere = new attributo("genere");
 		$this->attr[] = $this->eta = new attributo("eta");
 		$this->attr[] = $this->etnia = new attributo("etnia");
+		$this->attr[] = $this->dispositivo_id = new attributo("dispositivo_id", "int");
 		$this->attr[] = $this->processato = new attributo("processato", "bool_int");
 		$this->attr[] = $this->camera_id = new attributo("camera_id", "int");
 		$this->attr[] = $this->appearance_datetime = new attributo("appearance_datetime", "data_time");
+		$this->attr[] = $this->disappearance_datetime = new attributo("disappearance_datetime", "data_time");
 		$this->attr[] = $this->created_at = new attributo("created_at");
 		$this->attr[] = $this->updated_at = new attributo("updated_at");
-		$this->attr[] = $this->disappearance_datetime = new attributo("disappearance_datetime", "data_time");
 
 		if($id > 0){
 
@@ -407,12 +409,13 @@ class base_log_eventi_rpi {
 				$this->genere->set_valore($arr[0]["genere"]);
 				$this->eta->set_valore($arr[0]["eta"]);
 				$this->etnia->set_valore($arr[0]["etnia"]);
+				$this->dispositivo_id->set_valore($arr[0]["dispositivo_id"]);
 				$this->processato->set_valore($arr[0]["processato"]);
 				$this->camera_id->set_valore($arr[0]["camera_id"]);
 				$this->appearance_datetime->set_valore($arr[0]["appearance_datetime"]);
+				$this->disappearance_datetime->set_valore($arr[0]["disappearance_datetime"]);
 				$this->created_at->set_valore($arr[0]["created_at"]);
 				$this->updated_at->set_valore($arr[0]["updated_at"]);
-				$this->disappearance_datetime->set_valore($arr[0]["disappearance_datetime"]);
 		
 				$this->old_data["id"] = $this->id;
 				foreach($this->attr as $attr){
@@ -594,19 +597,20 @@ class base_log_eventi_rpi {
 			//andiamo a inserire le informazioni nel db
 			if($this->id == 0){
 
-				$sql = "INSERT INTO log_eventi_rpi (data_evento, genere, eta, etnia, processato, camera_id, appearance_datetime, created_at, updated_at, disappearance_datetime) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+				$sql = "INSERT INTO log_eventi_rpi (data_evento, genere, eta, etnia, dispositivo_id, processato, camera_id, appearance_datetime, disappearance_datetime, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
 				$dati_query = array(
 								$this->data_evento->get_valore(99), 
 								$this->genere->get_valore(99), 
 								$this->eta->get_valore(99), 
 								$this->etnia->get_valore(99), 
+								$this->dispositivo_id->get_valore(99), 
 								$this->processato->get_valore(99), 
 								$this->camera_id->get_valore(99), 
 								$this->appearance_datetime->get_valore(99), 
+								$this->disappearance_datetime->get_valore(99), 
 								$this->created_at->get_valore(99), 
-								$this->updated_at->get_valore(99), 
-								$this->disappearance_datetime->get_valore(99)
+								$this->updated_at->get_valore(99)
 							);
 
 				
@@ -637,7 +641,7 @@ class base_log_eventi_rpi {
 
 			}else{//aggiorniamo l'oggetto
 
-				$sql = "UPDATE log_eventi_rpi SET data_evento = ?, genere = ?, eta = ?, etnia = ?, processato = ?, camera_id = ?, appearance_datetime = ?, created_at = ?, updated_at = ?, disappearance_datetime = ?"
+				$sql = "UPDATE log_eventi_rpi SET data_evento = ?, genere = ?, eta = ?, etnia = ?, dispositivo_id = ?, processato = ?, camera_id = ?, appearance_datetime = ?, disappearance_datetime = ?, created_at = ?, updated_at = ?"
 						." WHERE id = ?";
 
 				$dati_query = array(
@@ -645,12 +649,13 @@ class base_log_eventi_rpi {
 								$this->genere->get_valore(99), 
 								$this->eta->get_valore(99), 
 								$this->etnia->get_valore(99), 
+								$this->dispositivo_id->get_valore(99), 
 								$this->processato->get_valore(99), 
 								$this->camera_id->get_valore(99), 
 								$this->appearance_datetime->get_valore(99), 
+								$this->disappearance_datetime->get_valore(99), 
 								$this->created_at->get_valore(99), 
 								$this->updated_at->get_valore(99), 
-								$this->disappearance_datetime->get_valore(99), 
 								$this->id
 							);
 
@@ -739,6 +744,16 @@ class base_log_eventi_rpi {
 	
 	/**
 	 * 
+	 * @param string $dispositivo_id
+	 * @return boolean true se il valore e' corretto, false altrimenti
+	 */
+	public function set_dispositivo_id($dispositivo_id) {
+		$this->dispositivo_id->set_valore($dispositivo_id);
+		return $this->dispositivo_id->is_corretto();
+	}
+	
+	/**
+	 * 
 	 * @param string $processato
 	 * @return boolean true se il valore e' corretto, false altrimenti
 	 */
@@ -769,6 +784,16 @@ class base_log_eventi_rpi {
 	
 	/**
 	 * 
+	 * @param string $disappearance_datetime
+	 * @return boolean true se il valore e' corretto, false altrimenti
+	 */
+	public function set_disappearance_datetime($disappearance_datetime) {
+		$this->disappearance_datetime->set_valore($disappearance_datetime);
+		return $this->disappearance_datetime->is_corretto();
+	}
+	
+	/**
+	 * 
 	 * @param string $created_at
 	 * @return boolean true se il valore e' corretto, false altrimenti
 	 */
@@ -785,16 +810,6 @@ class base_log_eventi_rpi {
 	public function set_updated_at($updated_at) {
 		$this->updated_at->set_valore($updated_at);
 		return $this->updated_at->is_corretto();
-	}
-	
-	/**
-	 * 
-	 * @param string $disappearance_datetime
-	 * @return boolean true se il valore e' corretto, false altrimenti
-	 */
-	public function set_disappearance_datetime($disappearance_datetime) {
-		$this->disappearance_datetime->set_valore($disappearance_datetime);
-		return $this->disappearance_datetime->is_corretto();
 	}
 	
 
@@ -826,6 +841,10 @@ class base_log_eventi_rpi {
 		return $this->etnia->get_valore($formattazione_dato);
 	}
 	
+	public function get_dispositivo_id($formattazione_dato = 1) {
+		return $this->dispositivo_id->get_valore($formattazione_dato);
+	}
+	
 	public function get_processato($formattazione_dato = 1) {
 		return $this->processato->get_valore($formattazione_dato);
 	}
@@ -838,16 +857,16 @@ class base_log_eventi_rpi {
 		return $this->appearance_datetime->get_valore($formattazione_dato);
 	}
 	
+	public function get_disappearance_datetime($formattazione_dato = 1) {
+		return $this->disappearance_datetime->get_valore($formattazione_dato);
+	}
+	
 	public function get_created_at($formattazione_dato = 1) {
 		return $this->created_at->get_valore($formattazione_dato);
 	}
 	
 	public function get_updated_at($formattazione_dato = 1) {
 		return $this->updated_at->get_valore($formattazione_dato);
-	}
-	
-	public function get_disappearance_datetime($formattazione_dato = 1) {
-		return $this->disappearance_datetime->get_valore($formattazione_dato);
 	}
 
 
@@ -890,5 +909,3 @@ class base_log_eventi_rpi {
 	}
 		
 }
-
-?>
