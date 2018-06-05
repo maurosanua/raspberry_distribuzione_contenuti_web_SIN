@@ -7,15 +7,20 @@ date_default_timezone_set('Europe/Rome');
 require_once('classi/master_class.php');
 init_sessione();
 
+$debug = 0;
+
 $conn = new DB_PDO();
 
 $data = file_get_contents('php://input');
-file_put_contents('../request_data/request.txt', "\r\n-----------------------------------------------", FILE_APPEND);
-file_put_contents('../request_data/request.txt', "\r\nIP: ".(isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : "---")." @ ".date("Y-m-d H:i:s")."\r\n", FILE_APPEND);
-file_put_contents('../request_data/request.txt', "\r\nGET:\r\n", FILE_APPEND);
-file_put_contents('../request_data/request.txt', json_encode($_GET), FILE_APPEND);
-file_put_contents('../request_data/request.txt', "\r\nPOST:\r\n", FILE_APPEND);
-file_put_contents('../request_data/request.txt', $data, FILE_APPEND);
+
+if($debug){
+    file_put_contents('../request_data/request.txt', "\r\n-----------------------------------------------", FILE_APPEND);
+    file_put_contents('../request_data/request.txt', "\r\nIP: ".(isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : "---")." @ ".date("Y-m-d H:i:s")."\r\n", FILE_APPEND);
+    file_put_contents('../request_data/request.txt', "\r\nGET:\r\n", FILE_APPEND);
+    file_put_contents('../request_data/request.txt', json_encode($_GET), FILE_APPEND);
+    file_put_contents('../request_data/request.txt', "\r\nPOST:\r\n", FILE_APPEND);
+    file_put_contents('../request_data/request.txt', $data, FILE_APPEND);
+}
 
 $arr_persone = json_decode($data,true);
 

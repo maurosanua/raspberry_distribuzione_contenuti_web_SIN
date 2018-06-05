@@ -3,6 +3,8 @@ date_default_timezone_set('Europe/Rome');
 require_once('../classi/master_class.php');
 init_sessione();
 
+$debug = 0;
+
 $conn = new DB_PDO();
 
 $sql = "SELECT * FROM dispositivi where numero_serie = ?";
@@ -93,12 +95,14 @@ foreach($arr_scena_fascia_oraria as $scena_fascia_oraria){
 	$array_punteggi[$scena_fascia_oraria["id"]] = $rel_obj->calcola_punteggio_di_matching($arr_eventi);
 }
 
-//log array dei punteggi e delle persone presenti davanti alla telecamera
-file_put_contents('../../request_data/punteggi.txt', "\r\n-----------------------------------------------", FILE_APPEND);
-file_put_contents('../../request_data/punteggi.txt', "\r\nPUNTEGGI:\r\n", FILE_APPEND);
-file_put_contents('../../request_data/punteggi.txt', json_encode($array_punteggi, JSON_PRETTY_PRINT), FILE_APPEND);
-file_put_contents('../../request_data/punteggi.txt', "\r\PERSONE:\r\n", FILE_APPEND);
-file_put_contents('../../request_data/punteggi.txt', json_encode($arr_eventi, JSON_PRETTY_PRINT), FILE_APPEND);
+if($debug){
+	//log array dei punteggi e delle persone presenti davanti alla telecamera
+	file_put_contents('../../request_data/punteggi.txt', "\r\n-----------------------------------------------", FILE_APPEND);
+	file_put_contents('../../request_data/punteggi.txt', "\r\nPUNTEGGI:\r\n", FILE_APPEND);
+	file_put_contents('../../request_data/punteggi.txt', json_encode($array_punteggi, JSON_PRETTY_PRINT), FILE_APPEND);
+	file_put_contents('../../request_data/punteggi.txt', "\r\PERSONE:\r\n", FILE_APPEND);
+	file_put_contents('../../request_data/punteggi.txt', json_encode($arr_eventi, JSON_PRETTY_PRINT), FILE_APPEND);
+}
 
 /*echo json_encode($array_punteggi,JSON_PRETTY_PRINT);
 die();*/
