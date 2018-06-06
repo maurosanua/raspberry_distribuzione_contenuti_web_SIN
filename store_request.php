@@ -7,7 +7,7 @@ date_default_timezone_set('Europe/Rome');
 require_once('classi/master_class.php');
 init_sessione();
 
-$debug = 0;
+$debug = 1;
 
 $conn = new DB_PDO();
 
@@ -40,14 +40,20 @@ $arr_log = array();
 foreach($arr_res as $id){
     $arr_log[] = new classe_log_eventi_rpi($id[0]);
 }
+foreach($arr_log as $log){
+    echo $log->get_camera_id(0)."\r\n";
+}
 
 if(isset($arr_persone["Audience"]) && is_array($arr_persone["Audience"])){
     foreach($arr_persone["Audience"] as $persona){
         $trovato = false;
-        foreach($arr_log as $log_evento){
-            if($persona["ID"]==$log_evento->get_camera_id(0)){
-                unset($log_evento);
+        for($i=count($arr_log)-1;$i>=0;$i--){
+            var_dump($persona["ID"]);
+            var_dump($arr_log[$i]->get_camera_id(0));
+            if($persona["ID"]==$arr_log[$i]->get_camera_id(0)){
+                unset($arr_log[$i]);
                 $trovato = true;
+                echo "TROVATO!";
                 break;
             }
         }
@@ -67,8 +73,12 @@ if(isset($arr_persone["Audience"]) && is_array($arr_persone["Audience"])){
     }
 }
 
+foreach($arr_log as $log){
+    echo $log->get_camera_id(0)."\r\n";
+}
+
 foreach($arr_log as $log_evento){
-    $log_evento->set_disappearance_datetime(date("Y-m-d H:i:s"));
+    $log_evento->set_disappearance_datetime(substr($arr_persone["PostDateTime"],0,10)." ".substr($arr_persone["PostDateTime"],11));
     $log_evento->salva(false);
 }
 echo "ok";

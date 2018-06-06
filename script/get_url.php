@@ -129,6 +129,7 @@ $log_scena_obj->set_rel_fascia_scene_id($scena_da_vedere->get_id());
 $log_scena_obj->set_scena_id($scena_da_vedere->get_scena_id());
 $log_scena_obj->set_dispositivo_id($dispositivo_id);
 $log_scena_obj->set_data_start($adesso);
+$log_scena_obj->set_processato(0);
 $log_scena_obj->salva(false);
 
 echo $scena_da_vedere->genera_output_geturl();
