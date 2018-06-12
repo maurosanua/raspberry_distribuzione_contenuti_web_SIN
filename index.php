@@ -2,6 +2,7 @@
 date_default_timezone_set('Europe/Rome');
 require_once('classi/master_class.php');
 
+//inizializza db conn
 $conn = new DB_PDO();
 
 
