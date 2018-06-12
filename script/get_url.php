@@ -77,8 +77,9 @@ if(isset($rel_fascia_scene)){
 	if($rel_fascia_scene->is_forzata() || count($arr_eventi)==0){
 		//controlliamo che non sia finito il suo tempo di esecuzione
 		$inizio_scena = new DateTime($scena_live->get_data_start(0));
-		$diff = $adesso->diff($inizio_scena);
-		if($diff->s<$rel_fascia_scene->get_durata_ms(0)/1000){
+		$diff = $inizio_scena->diff($adesso);
+		
+		if(date_create('@0')->add($diff)->getTimestamp()<$rel_fascia_scene->get_durata_ms(0)/1000){
 			echo $rel_fascia_scene->genera_output_geturl();
 			$conn->Close();
 			die();
