@@ -21,17 +21,10 @@ define("JSON_DEBUG", true);
 define("DB_WRITE_DISABLED", false);
 
 
-/*	PARAMETRI LDAP
--------------------------------------------------------------------------------------------------------------------------------- */
-define("LOGIN_AD", false); //serve per dire alla classe_user se fare o meno il login su AD
-define("AD_SERVER", "172.16.30.12");
-define("AD_DOMAIN", "sinergo");
-
-
-define("URL_RASPBERRY","http://raspberry_url.it");
-define("URL_SERVER","http://palinsesto.it");
-
 /*  PARAMETRI SISTEMA OPERATIVO IN USO
 -------------------------------------------------------------------------------------------------------------------------------- */
 define("SISTEMA", "linux");
+define("URL_RASPBERRY","http://raspberry_url.it");
+define("URL_SERVER","http://palinsesto.it");
+
 ?>
