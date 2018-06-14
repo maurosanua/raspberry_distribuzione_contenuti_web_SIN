@@ -3,7 +3,7 @@ date_default_timezone_set('Europe/Rome');
 require_once('../classi/master_class.php');
 init_sessione();
 
-$debug = 0;
+$debug = 1;
 
 $conn = new DB_PDO();
 
@@ -38,7 +38,9 @@ $fascia_oraria = $conn->query_risultati(
 
 //recupero tutte le relazioni scena-fascia_oraria
 if(count($fascia_oraria) == 0){
-	// da capire cosa fare
+	$arr_return = array("url"=>URL_RASPBERRY."/blanck.php","durata"=>"10", "code"=>"-1", "status"=>"OK");
+	echo json_encode($arr_return);
+	die();
 }
 
 $arr_scena_fascia_oraria = $conn->query_risultati(
@@ -63,7 +65,12 @@ if(count($arr_scena_live)>0){
 }
 
 if(isset($scena_live)){
-	$rel_fascia_scene = new classe_rel_scene_fascia_oraria($scena_live->get_rif_rel_fascia_scene(0));
+	try{
+		$rel_fascia_scene = new classe_rel_scene_fascia_oraria($scena_live->get_rif_rel_fascia_scene(0));
+	}catch(Exception $e){
+		$conn->esegui_query("delete from scene_live");
+		echo "Reset";
+	}
 }
 
 //recupero tutte le persone davanti allo schermo
@@ -89,18 +96,22 @@ if(isset($rel_fascia_scene)){
 
 //per ogni scena-fascia_oraria assegno un punteggio
 $array_punteggi = array();
+$arr_debug = array();
 foreach($arr_scena_fascia_oraria as $scena_fascia_oraria){
 	$rel_obj = new classe_rel_scene_fascia_oraria($scena_fascia_oraria["id"]);
 	$rel_obj->data_start = $scena_fascia_oraria["data_start"];
 	
 	$array_punteggi[$scena_fascia_oraria["id"]] = $rel_obj->calcola_punteggio_di_matching($arr_eventi);
+	if($debug){
+		$arr_debug[$scena_fascia_oraria["id"]] = $rel_obj->calcola_punteggio_di_matching($arr_eventi,true);
+	}
 }
 
 if($debug){
 	//log array dei punteggi e delle persone presenti davanti alla telecamera
 	file_put_contents('../../request_data/punteggi.txt', "\r\n-----------------------------------------------", FILE_APPEND);
 	file_put_contents('../../request_data/punteggi.txt', "\r\nPUNTEGGI:\r\n", FILE_APPEND);
-	file_put_contents('../../request_data/punteggi.txt', json_encode($array_punteggi, JSON_PRETTY_PRINT), FILE_APPEND);
+	file_put_contents('../../request_data/punteggi.txt', json_encode($arr_debug, JSON_PRETTY_PRINT), FILE_APPEND);
 	file_put_contents('../../request_data/punteggi.txt', "\r\PERSONE:\r\n", FILE_APPEND);
 	file_put_contents('../../request_data/punteggi.txt', json_encode($arr_eventi, JSON_PRETTY_PRINT), FILE_APPEND);
 }
@@ -110,6 +121,7 @@ die();*/
 
 //recuperalo la scena col punteggio maggiore e la faccio vedere
 $id_scena_da_vedere = array_search(max($array_punteggi), $array_punteggi);
+file_put_contents('../../request_data/punteggi.txt', "scelta scena: ".$id_scena_da_vedere."\r\n", FILE_APPEND);
 $scena_da_vedere = new classe_rel_scene_fascia_oraria($id_scena_da_vedere);
 $scena_da_vedere->aggiorna_scene_live();
 

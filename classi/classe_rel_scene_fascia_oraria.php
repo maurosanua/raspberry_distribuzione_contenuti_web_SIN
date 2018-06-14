@@ -318,7 +318,7 @@ class classe_rel_scene_fascia_oraria extends base_rel_scene_fascia_oraria {
 	 * metodi ad hoc
 	 */
 	
-	public function calcola_punteggio_di_matching($arr_eventi){
+	public function calcola_punteggio_di_matching($arr_eventi,$detail = false){
 		$numero_match_categorie = 0;
 		$numero_match_persone = 0;
 		$tempo_passato_dalla_visione = 0;
@@ -348,21 +348,30 @@ class classe_rel_scene_fascia_oraria extends base_rel_scene_fascia_oraria {
 			}
 		}
 
+		
 		$inizio_scena = is_null($this->data_start) ? null : new DateTime($this->data_start);
-		$adesso = new DateTime();
-		if(is_null($inizio_scena) || ($adesso->diff($inizio_scena))->s > 86400){
-			$tempo_passato_dalla_visione = 86400;
-		} else {
-			$tempo_passato_dalla_visione = ($adesso->diff($inizio_scena))->s;
-			
+		
+		$diff = 86400;
+		if(!is_null($inizio_scena)){
+			$adesso = new DateTime();
+			$diff_int = $inizio_scena->diff($adesso);
+			$diff = min(date_create('@0')->add($diff_int)->getTimestamp(),$diff);
 		}
-
-		return $generica + ($peso_categorie * $numero_match_categorie) + ($peso_persone * $numero_match_persone) + ($peso_data * $tempo_passato_dalla_visione);
+		$tempo_passato_dalla_visione = $diff;
+		
+		
+		
+		if(!$detail){
+			return $generica + ($peso_categorie * $numero_match_categorie) + ($peso_persone * $numero_match_persone) + ($peso_data * $tempo_passato_dalla_visione);
+		}
 		return array(
 			"generica"=>$generica,
 			"numero_match_categorie"=>$numero_match_categorie,
+			"peso_match_categorie"=>$peso_categorie,
 			"numero_match_persone"=>$numero_match_persone,
-			"tempo_passato_dalla_visione"=>$peso_data*$tempo_passato_dalla_visione,
+			"peso_match_persone"=>$peso_persone,
+			"tempo_passato_dalla_visione"=>$tempo_passato_dalla_visione,
+			"peso_tempo"=>$peso_data,
 			"totale"=>$generica + ($peso_categorie * $numero_match_categorie) + ($peso_persone * $numero_match_persone) + ($peso_data * $tempo_passato_dalla_visione)
 		);
 
