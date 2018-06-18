@@ -319,7 +319,7 @@ class classe_scene extends base_scene {
 	 */
 	 
 	public function genera_url() {
-		$url = "blanck.php";
+		$url = "blank.php";
 				
 		switch ($this->get_tipo_scena_id()){
 			case 1:
@@ -351,7 +351,7 @@ class classe_scene extends base_scene {
 				$url = URL_RASPBERRY."/contents/siti/".substr($filename,0,count($filename)-5)."/";
 				break;
 			default :
-				$url = "blanck.php";
+				$url = "blank.php";
 		}
 		
 		return $url;

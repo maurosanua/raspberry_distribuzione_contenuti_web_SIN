@@ -38,7 +38,7 @@ $fascia_oraria = $conn->query_risultati(
 
 //recupero tutte le relazioni scena-fascia_oraria
 if(count($fascia_oraria) == 0){
-	$arr_return = array("url"=>URL_RASPBERRY."/blanck.php","durata"=>"10", "code"=>"-1", "status"=>"OK");
+	$arr_return = array("url"=>URL_RASPBERRY."/blank.php","durata"=>"10", "code"=>"-1", "status"=>"OK");
 	echo json_encode($arr_return);
 	die();
 }
