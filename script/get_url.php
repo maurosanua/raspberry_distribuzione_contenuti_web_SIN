@@ -125,7 +125,7 @@ file_put_contents('../../request_data/punteggi.txt', "scelta scena: ".$id_scena_
 $scena_da_vedere = new classe_rel_scene_fascia_oraria($id_scena_da_vedere);
 
 
-if(!$scena_da_vedere->is_forzata()){
+if(isset($rel_fascia_scene)&&!$scena_da_vedere->is_forzata()){
 	//controlliamo che sia finito il tempo di esecuzione (se la nuova scena è generica)
 	$inizio_scena = new DateTime($scena_live->get_data_start(0));
 	$diff = $inizio_scena->diff($adesso);
