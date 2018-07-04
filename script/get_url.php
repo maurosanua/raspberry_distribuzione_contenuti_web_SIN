@@ -123,6 +123,20 @@ die();*/
 $id_scena_da_vedere = array_search(max($array_punteggi), $array_punteggi);
 file_put_contents('../../request_data/punteggi.txt', "scelta scena: ".$id_scena_da_vedere."\r\n", FILE_APPEND);
 $scena_da_vedere = new classe_rel_scene_fascia_oraria($id_scena_da_vedere);
+
+
+if(!$scena_da_vedere->is_forzata()){
+	//controlliamo che sia finito il tempo di esecuzione (se la nuova scena è generica)
+	$inizio_scena = new DateTime($scena_live->get_data_start(0));
+	$diff = $inizio_scena->diff($adesso);
+	
+	if(date_create('@0')->add($diff)->getTimestamp()<$rel_fascia_scene->get_durata_ms(0)/1000){
+		echo $rel_fascia_scene->genera_output_geturl();
+		$conn->Close();
+		die();
+	}
+}
+
 $scena_da_vedere->aggiorna_scene_live();
 
 
