@@ -46,8 +46,8 @@ if(count($fascia_oraria) == 0){
 $arr_scena_fascia_oraria = $conn->query_risultati(
 	"SELECT rel_scene_fascia_oraria.*, scene_live.data_start, scene_live.live, scene_live.id AS id_scene_live
  	 FROM rel_scene_fascia_oraria LEFT JOIN scene_live ON scene_live.rif_rel_fascia_scene = rel_scene_fascia_oraria.id
-	 WHERE fascia_oraria_id = ? AND (scene_live.live IS NULL OR scene_live.live = 0)",
-	array($fascia_oraria[0]["id"])
+	 WHERE fascia_oraria_id in (".implode(",",array_fill(0,count($fascia_oraria),"?")).") AND (scene_live.live IS NULL OR scene_live.live = 0)",
+	array_column($fascia_oraria,"id")
 );
 
 //recupero la scena corrente
