@@ -60,11 +60,11 @@ $conn->Close();
     <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
 
 </head>
-<body style="margin:0px;background-color:#000000;">
+<body style="margin:0px;background-color:#000000;overflow:hidden;">
 
-<div style="width:100%;height:100%; text-align:center;">
+<div style="width:100%;height:100%; text-align:center;overflow:hidden;">
 
-    <div style="width:100%; text-align:center; position:absolute;" id="contenitore">
+    <div style="width:100%; text-align:center; position:absolute;overflow:hidden;" id="contenitore">
 
 <?php
 
