@@ -97,30 +97,47 @@ if(isset($rel_fascia_scene)){
 //per ogni scena-fascia_oraria assegno un punteggio
 $array_punteggi = array();
 $arr_debug = array();
-foreach($arr_scena_fascia_oraria as $scena_fascia_oraria){
-	$rel_obj = new classe_rel_scene_fascia_oraria($scena_fascia_oraria["id"]);
-	$rel_obj->data_start = $scena_fascia_oraria["data_start"];
-	
-	$array_punteggi[$scena_fascia_oraria["id"]] = $rel_obj->calcola_punteggio_di_matching($arr_eventi);
+
+if(count($arr_scena_fascia_oraria)>0){
+
+	foreach($arr_scena_fascia_oraria as $scena_fascia_oraria){
+		$rel_obj = new classe_rel_scene_fascia_oraria($scena_fascia_oraria["id"]);
+		$rel_obj->data_start = $scena_fascia_oraria["data_start"];
+		
+		$array_punteggi[$scena_fascia_oraria["id"]] = $rel_obj->calcola_punteggio_di_matching($arr_eventi);
+		if($debug){
+			$arr_debug[$scena_fascia_oraria["id"]] = $rel_obj->calcola_punteggio_di_matching($arr_eventi,true);
+		}
+	}
+
 	if($debug){
-		$arr_debug[$scena_fascia_oraria["id"]] = $rel_obj->calcola_punteggio_di_matching($arr_eventi,true);
+		//log array dei punteggi e delle persone presenti davanti alla telecamera
+		file_put_contents('../../request_data/punteggi.txt', "\r\n-----------------------------------------------", FILE_APPEND);
+		file_put_contents('../../request_data/punteggi.txt', "\r\nPUNTEGGI:\r\n", FILE_APPEND);
+		file_put_contents('../../request_data/punteggi.txt', json_encode($arr_debug, JSON_PRETTY_PRINT), FILE_APPEND);
+		file_put_contents('../../request_data/punteggi.txt', "\r\PERSONE:\r\n", FILE_APPEND);
+		file_put_contents('../../request_data/punteggi.txt', json_encode($arr_eventi, JSON_PRETTY_PRINT), FILE_APPEND);
+	}
+
+	/*echo json_encode($array_punteggi,JSON_PRETTY_PRINT);
+	die();*/
+
+	//recuperalo la scena col punteggio maggiore e la faccio vedere
+	$id_scena_da_vedere = array_search(max($array_punteggi), $array_punteggi);
+}else{
+	$sql = "select * from scene limit 0,1";
+	$arr = $conn->query_risultati($sql);
+	if(count($arr)>0){
+		$id_scena_da_vedere = $arr[0]["id"];
+
+		$sql = "select * from rel_scene_fascia_oraria where scena_id = ? limit 0,1";
+		$arr = $conn->query_risultati($sql,array($id_scena_da_vedere));
+		if(count($arr)>0){
+			$id_scena_da_vedere = $arr[0]["id"];
+			
+		}
 	}
 }
-
-if($debug){
-	//log array dei punteggi e delle persone presenti davanti alla telecamera
-	file_put_contents('../../request_data/punteggi.txt', "\r\n-----------------------------------------------", FILE_APPEND);
-	file_put_contents('../../request_data/punteggi.txt', "\r\nPUNTEGGI:\r\n", FILE_APPEND);
-	file_put_contents('../../request_data/punteggi.txt', json_encode($arr_debug, JSON_PRETTY_PRINT), FILE_APPEND);
-	file_put_contents('../../request_data/punteggi.txt', "\r\PERSONE:\r\n", FILE_APPEND);
-	file_put_contents('../../request_data/punteggi.txt', json_encode($arr_eventi, JSON_PRETTY_PRINT), FILE_APPEND);
-}
-
-/*echo json_encode($array_punteggi,JSON_PRETTY_PRINT);
-die();*/
-
-//recuperalo la scena col punteggio maggiore e la faccio vedere
-$id_scena_da_vedere = array_search(max($array_punteggi), $array_punteggi);
 file_put_contents('../../request_data/punteggi.txt', "scelta scena: ".$id_scena_da_vedere."\r\n", FILE_APPEND);
 $scena_da_vedere = new classe_rel_scene_fascia_oraria($id_scena_da_vedere);
 
