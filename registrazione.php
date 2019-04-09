@@ -27,7 +27,7 @@ $k = SERIALE;
 			</div>
 		</div>
 			<div>
-				<h1>Registrazione nuovo dispositivo</h1>
+				<h1>Registrazione nuovo dispositivo 1</h1>
 			<br><p>Inquadra il codice QR o digita l'url sottostante per attivare questo dispositivo.<br>Se non visualizzi il QR code verifica la connessione a internet.</p>
 			</div>
 						
