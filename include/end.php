@@ -1,6 +1,0 @@
-	</div>
-    <!-- /#wrapper -->
-	
-
-</body>
-</html>

@@ -56,8 +56,8 @@ $conn->Close();
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
     <meta name="author" content="">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-    <script src="https://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
+    <script src="./jquery.min.js"></script>
+    <script src="./jquery-ui.min.js"></script>
 
 </head>
 <body style="margin:0px;background-color:#000000;overflow:hidden;">

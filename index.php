@@ -46,20 +46,8 @@ if(count($arr)>0){
 
 
 
- <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+ <script src="./jquery.min.js"></script>
  <script>
- 
-  $("#bottone").click(function(e) {
-      e.preventDefault();
-      var src = "https://app.innovafarmacia.it//sites/mastersumo/monitor/pfizer/viagra";
-
-      $('#iframe1').fadeOut(1000,function(){
-          $('#iframe1').attr('src',src ).load(function(){
-              $(this).fadeIn(1000);    
-          });
-      });
-
- });
  
 $(document).ready(function() {
 	var altezza = $( window ).height()+"px";
