@@ -32,6 +32,8 @@ if(strlen($tipo)==0 || $tipo == "empty"){
 	$log_obj->set_dispositivo_id($id_dispositivo);
 	$log_obj->set_disappearance_datetime(null);
 	$log_obj->set_genere($tipo);
+	$log_obj->set_eta("Adult");
+	$log_obj->set_etnia("Caucasian");
 	$log_obj->salva(false);	
 }
 
