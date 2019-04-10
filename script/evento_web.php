@@ -8,27 +8,46 @@ $conn = new DB_PDO();
 $tipo = isset($_GET["tipo"])?$_GET["tipo"]:"";
 
 echo $tipo;
+$arr_dispositivo = $conn->query_risultati(
+    "SELECT * FROM dispositivi"
+    );
 
-$log_obj = new classe_log_eventi_rpi();
-$log_obj->set_camera_id(null);
-$log_obj->set_data_evento(date("Y-m-d H:i:s"));
-$log_obj->set_processato(0);
-
+$id_dispositivo = null;
+if(count($arr_dispositivo)>0){
+    $id_dispositivo = $arr_dispositivo[0]["id"];
+}
 
 if(strlen($tipo)==0 || $tipo == "empty"){
-	$sql = "UPDATE log_eventi_rpi set processato = 1";
-	$conn->esegui_query($sql);
-	$log_obj->set_processato(1);
-	
+	$sql = "UPDATE log_eventi_rpi set processato = :proc, disappearance_datetime =:disapp where disappearance_datetime is null";
+	$conn->esegui_query($sql,["proc"=>1,"disapp"=>date("Y-m-d H:i:s")]);
+	echo "reset";
 	
 }else{
-	//echo "qui";
-	$log_obj->set_genere($tipo);
 	
+	$log_obj = new classe_log_eventi_rpi();
+	$log_obj->set_camera_id(null);
+	$log_obj->set_data_evento(date("Y-m-d H:i:s"));
+	$log_obj->set_appearance_datetime(date("Y-m-d H:i:s"));
+	$log_obj->set_processato(0);
+	$log_obj->set_dispositivo_id($id_dispositivo);
+	$log_obj->set_disappearance_datetime(null);
+	$log_obj->set_genere($tipo);
+	$log_obj->salva(false);	
 }
 
 
-$log_obj->salva(false);
+            
+
+            
+            
+            
+            
+            
+            
+            
+
+
+
 	
 	
 $conn->Close();
