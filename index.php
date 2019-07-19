@@ -64,6 +64,7 @@ function aggiorna_url(){
 		
 		dataType: "json",
 		success: function (json_risposta) {
+			console.log("PalinsestoFacileSanityCheck");
 			console.log((new Date).toISOString()+JSON.stringify(json_risposta));
 			if (json_risposta.status === "OK"){
 
