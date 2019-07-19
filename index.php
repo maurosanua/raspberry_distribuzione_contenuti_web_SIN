@@ -64,7 +64,7 @@ function aggiorna_url(){
 		
 		dataType: "json",
 		success: function (json_risposta) {
-			console.log(json_risposta);
+			console.log(JSON.stringify(json_risposta),new Date());
 			if (json_risposta.status === "OK"){
 
 				if(json_risposta.code != url_code){
