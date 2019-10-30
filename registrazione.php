@@ -20,7 +20,7 @@ $k = SERIALE;
 <html>
 	<head>
 	</head>
-	<body style="text-align: center;">
+	<body style="text-align: center;color:white;">
 		<div class=row>
 			<div> 
 				<img src="img/logo.png" style="padding-top: 20px; padding-bottom: 20px">
