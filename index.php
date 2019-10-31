@@ -38,7 +38,7 @@ if(count($arr)>0){
 }
 ?><html>
 	<head>
-		<title>Rasp-url</title>
+		<title>Palinsesto Facile</title>
 	</head>
 	<body style="margin: 0px;overflow: hidden;background-color:#000000">
 		<iframe id="iframe1" src="blank.php" data-id="" style="width:<?=$larghezza?>px;height:<?=$altezza?>px;overflow:hidden;overflow-y: scroll; position: absolute; top:<?=$y_offset?>px;left:<?=$x_offset?>px" frameBorder="0" allow="autoplay;fullscreen"></iframe> 
