@@ -59,7 +59,7 @@ var url_code = 0;
  
 function aggiorna_url(){
 	$.ajax({
-		url: "script/get_url.php",
+		url: "script/get_url.php?date="+new Date(),
 		method: "POST",
 		
 		dataType: "json",
