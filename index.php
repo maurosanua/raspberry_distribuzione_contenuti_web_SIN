@@ -100,6 +100,7 @@ function change_url(url, code){
 		$('#iframe1').attr('src',url );
 		console.log("url changed to ",$('#iframe1').attr('src'))
 		$('#iframe1').off("load").load(function(){
+			console.log("fading in");
 			$(this).fadeIn(1000);    
 		});
 	});
