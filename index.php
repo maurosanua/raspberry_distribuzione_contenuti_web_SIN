@@ -97,7 +97,9 @@ aggiorna_loop();
 
 function change_url(url, code){
 	$('#iframe1').fadeOut(500,function(){
-		$('#iframe1').attr('src',url ).load(function(){
+		$('#iframe1').attr('src',url );
+		console.log("url changed to ",$('#iframe1').attr('src'))
+		$('#iframe1').off("load").load(function(){
 			$(this).fadeIn(1000);    
 		});
 	});
